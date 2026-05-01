@@ -1,85 +1,1471 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTube Hook Generator for Faceless Channels</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Hook Generator — Get Viral Hooks in 5 Seconds</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111114;
+      --surface-2: #1a1a1f;
+      --surface-3: #232329;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.15);
+      --text: #ffffff;
+      --text-secondary: #a1a1aa;
+      --text-muted: #52525b;
+      --accent: #7c3aed;
+      --accent-light: #a78bfa;
+      --accent-dark: #5b21b6;
+      --accent-glow: rgba(124,58,237,0.25);
+      --success: #22c55e;
+      --danger: #ef4444;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --transition: 0.2s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0 1.5rem;
+      transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
+    }
+
+    .navbar.scrolled {
+      background: rgba(10,10,10,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .navbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .navbar-logo svg { color: var(--accent-light); }
+
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .navbar-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color var(--transition);
+    }
+
+    .navbar-links a:hover { color: var(--text); }
+
+    .navbar-cta {
+      padding: 0.5rem 1.25rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+      text-decoration: none;
+    }
+
+    .navbar-cta:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+    .mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      padding: 8rem 1.5rem 4rem;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 1rem;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-light);
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+      animation: fadeInUp 0.6s ease-out 0.1s both;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #fff 0%, var(--accent-light) 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto 2rem;
+      line-height: 1.7;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .hero-social-proof {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+      animation: fadeInUp 0.6s ease-out 0.3s both;
+    }
+
+    .avatar-stack {
+      display: flex;
+    }
+
+    .avatar-stack span {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      margin-left: -8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .avatar-stack span:nth-child(1) { margin-left: 0; background: #7c3aed; z-index: 4; }
+    .avatar-stack span:nth-child(2) { background: #ec4899; z-index: 3; }
+    .avatar-stack span:nth-child(3) { background: #f59e0b; z-index: 2; }
+    .avatar-stack span:nth-child(4) { background: #10b981; z-index: 1; }
+
+    .social-text {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .social-text strong { color: var(--text); }
+
+    .stars {
+      display: flex;
+      gap: 2px;
+      color: #f59e0b;
+      font-size: 0.85rem;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Generator Card ── */
+    .generator-card {
+      max-width: 680px;
+      margin: 0 auto 2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      position: relative;
+      z-index: 2;
+      animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+
+    .gen-input-wrap {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+
+    .gen-input-wrap svg {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .gen-input {
+      width: 100%;
+      padding: 0.95rem 1rem 0.95rem 2.75rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .gen-input::placeholder { color: var(--text-muted); }
+    .gen-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .style-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .style-pill {
+      padding: 0.5rem 1rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--transition);
+      user-select: none;
+    }
+
+    .style-pill:hover {
+      border-color: var(--accent-light);
+      color: var(--text);
+    }
+
+    .style-pill.selected {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+
+    .gen-btn {
+      width: 100%;
+      padding: 0.95rem;
+      background: linear-gradient(135deg, var(--accent), #6d28d9);
+      border: none;
+      border-radius: var(--radius);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .gen-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+
+    .gen-btn:active { transform: translateY(0); }
+
+    .gen-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .gen-btn .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+
+    .gen-btn.loading .spinner { display: block; }
+    .gen-btn.loading .btn-label { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .gen-usage {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+    }
+
+    .gen-error {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      color: #fca5a5;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .gen-error.visible { display: block; }
+
+    /* ── Hook Results ── */
+    .results-section {
+      max-width: 680px;
+      margin: 0 auto;
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .results-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .hook-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .hook-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+      animation: fadeInUp 0.4s ease-out both;
+    }
+
+    .hook-item:nth-child(1) { animation-delay: 0.05s; }
+    .hook-item:nth-child(2) { animation-delay: 0.1s; }
+    .hook-item:nth-child(3) { animation-delay: 0.15s; }
+    .hook-item:nth-child(4) { animation-delay: 0.2s; }
+    .hook-item:nth-child(5) { animation-delay: 0.25s; }
+
+    .hook-item:hover {
+      transform: translateX(4px);
+      border-color: var(--border-hover);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .hook-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(124,58,237,0.15);
+      color: var(--accent-light);
+      font-weight: 700;
+      font-size: 0.8rem;
+      border-radius: 50%;
+    }
+
+    .hook-text {
+      flex: 1;
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .hook-copy {
+      flex-shrink: 0;
+      padding: 0.4rem 0.75rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .hook-copy:hover { background: var(--surface-3); color: var(--text); }
+    .hook-copy.copied { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--success); }
+
+    .blurred-results .hook-item .hook-text {
+      filter: blur(8px);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* ── Logo Marquee ── */
+    .logos-section {
+      padding: 4rem 1.5rem;
+      text-align: center;
+    }
+
+    .logos-section p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+
+    .logo-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem 3rem;
+      max-width: 800px;
+      margin: 0 auto;
+      opacity: 0.4;
+    }
+
+    .logo-grid span {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Feature Sections ── */
+    .feature-section {
+      padding: 5rem 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .feature-section .section-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-light);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.75rem;
+    }
+
+    .feature-section h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .feature-section .section-desc {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+    }
+
+    .feature-card .icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(124,58,237,0.12);
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      color: var(--accent-light);
+    }
+
+    .feature-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── How it Works ── */
+    .how-section {
+      padding: 5rem 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .how-section h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      margin-bottom: 3rem;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-number {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.2rem;
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+    }
+
+    .step h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .step p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── Testimonials ── */
+    .testimonials-section {
+      padding: 5rem 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .testimonials-section h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+    }
+
+    .testimonial-card .quote {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .testimonial-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #fff;
+    }
+
+    .testimonial-name { font-weight: 600; font-size: 0.9rem; }
+    .testimonial-role { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      padding: 5rem 1.5rem;
+      text-align: center;
+    }
+
+    .cta-banner-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(124,58,237,0.05));
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: var(--radius-xl);
+      padding: 3rem 2rem;
+    }
+
+    .cta-banner h2 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-banner p {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .cta-banner .gen-btn {
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    /* ── FAQ ── */
+    .faq-section {
+      padding: 5rem 1.5rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .faq-section h2 {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 1.25rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .faq-question svg {
+      flex-shrink: 0;
+      transition: transform var(--transition);
+    }
+
+    .faq-item.open .faq-question svg { transform: rotate(45deg); }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .faq-answer p {
+      padding-bottom: 1.25rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .faq-item.open .faq-answer { max-height: 300px; }
+
+    /* ── Footer ── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 1.5rem;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-left {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    /* ── Paywall Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem 2rem;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      animation: scaleIn 0.3s ease-out;
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-icon {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent), #6d28d9);
+      border-radius: 50%;
+      margin: 0 auto 1.25rem;
+      font-size: 1.75rem;
+    }
+
+    .modal-box h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-box .modal-sub {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-price {
+      font-size: 3rem;
+      font-weight: 900;
+      margin: 1rem 0;
+    }
+
+    .modal-price span {
+      font-size: 1rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .modal-btn-primary {
+      padding: 0.85rem;
+      background: linear-gradient(135deg, var(--accent), #6d28d9);
+      border: none;
+      border-radius: var(--radius);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition);
+      text-decoration: none;
+      text-align: center;
+      display: block;
+    }
+
+    .modal-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+
+    .modal-btn-secondary {
+      padding: 0.85rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .modal-btn-secondary:hover {
+      border-color: var(--accent-light);
+      color: var(--text);
+    }
+
+    .modal-trust {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .modal-trust span {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .navbar-links { display: none; }
+      .mobile-toggle { display: block; }
+
+      .hero { padding: 7rem 1rem 3rem; }
+      .hero-social-proof { flex-direction: column; gap: 0.75rem; }
+
+      .generator-card { padding: 1.5rem; margin: 0 0.5rem 2rem; }
+
+      .steps { grid-template-columns: 1fr; gap: 1.5rem; }
+
+      .feature-grid { grid-template-columns: 1fr; }
+      .testimonial-grid { grid-template-columns: 1fr; }
+
+      .cta-banner-inner { padding: 2rem 1.5rem; }
+
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
+
+    /* ── Mobile Nav ── */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      z-index: 99;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .mobile-nav.open { display: flex; }
+
+    .mobile-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      transition: color var(--transition);
+    }
+
+    .mobile-nav a:hover { color: var(--text); }
+
+    /* ── Scroll animations ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <h1>Get Viral YouTube Hooks in 5 Seconds</h1>
-      <p class="subheadline">Increase retention. Get more views. No writing skills needed.</p>
-      <span class="trust-line">Used by 2,847+ faceless creators</span>
-    </header>
 
-    <main class="main">
-      <div class="input-section">
-        <label for="topic">Enter your video topic</label>
-        <input type="text" id="topic" placeholder="How to make money with AI in 2026" autocomplete="off">
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="#" class="navbar-logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        HookForge
+      </a>
+      <div class="navbar-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#testimonials">Testimonials</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <a href="#generator" class="navbar-cta">Get Free Hooks</a>
+      <button class="mobile-toggle" onclick="document.getElementById('mobileNav').classList.toggle('open')" aria-label="Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#features" onclick="this.parentElement.classList.remove('open')">Features</a>
+    <a href="#how-it-works" onclick="this.parentElement.classList.remove('open')">How It Works</a>
+    <a href="#testimonials" onclick="this.parentElement.classList.remove('open')">Testimonials</a>
+    <a href="#faq" onclick="this.parentElement.classList.remove('open')">FAQ</a>
+    <a href="#generator" onclick="this.parentElement.classList.remove('open')">Get Free Hooks</a>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero" id="generator">
+    <div class="hero-glow"></div>
+
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Free AI-Powered Tool
+    </div>
+
+    <h1><span class="gradient-text">Get Viral YouTube<br>Hooks in 5 Seconds</span></h1>
+
+    <p class="hero-sub">Increase retention. Get more views. No writing skills needed. Powered by AI, trusted by faceless creators worldwide.</p>
+
+    <div class="hero-social-proof">
+      <div class="avatar-stack">
+        <span>JK</span>
+        <span>AR</span>
+        <span>ML</span>
+        <span>TS</span>
+      </div>
+      <div class="stars">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <p class="social-text"><strong>2,847+</strong> creators generating hooks</p>
+    </div>
+
+    <!-- Generator -->
+    <div class="generator-card">
+      <div class="gen-input-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="gen-input" id="topic" placeholder="e.g. How to make money with AI in 2026" autocomplete="off" />
       </div>
 
-      <div class="styles-section">
-        <label>Select styles (multiple allowed)</label>
-        <div class="style-buttons" id="styleButtons">
-          <button class="style-btn" data-style="Curiosity">Curiosity</button>
-          <button class="style-btn" data-style="Shock">Shock</button>
-          <button class="style-btn" data-style="Authority">Authority</button>
-          <button class="style-btn" data-style="Story">Story</button>
-        </div>
+      <div class="style-pills" id="stylePills">
+        <button type="button" class="style-pill" data-style="Curiosity">Curiosity</button>
+        <button type="button" class="style-pill" data-style="Shock">Shock</button>
+        <button type="button" class="style-pill" data-style="Authority">Authority</button>
+        <button type="button" class="style-pill" data-style="Story">Story</button>
       </div>
 
-      <button id="generateBtn" class="generate-btn">
-        <span class="btn-text">Generate Hooks</span>
-        <span class="spinner" style="display:none;"></span>
+      <button type="button" class="gen-btn" id="generateBtn" onclick="generateHooks()">
+        <span class="btn-label">Generate 5 Viral Hooks</span>
+        <span class="spinner"></span>
       </button>
 
-      <div id="error" class="error" style="display:none;"></div>
+      <p class="gen-usage" id="usageInfo"></p>
+      <div class="gen-error" id="genError"></div>
+    </div>
 
-      <div id="resultsContainer" class="results-container" style="display:none;">
-        <div id="results" class="results"></div>
+    <!-- Results -->
+    <div class="results-section" id="resultsSection" style="display:none;">
+      <div class="results-header">
+        <h3>Your Viral Hooks</h3>
       </div>
-    </main>
-  </div>
+      <div class="hook-list" id="hookList"></div>
+    </div>
+  </section>
 
-  <div id="scriptModal" class="script-overlay" style="display:none;">
-    <div class="script-modal">
-      <div class="script-header">
-        <h2>Full YouTube Script</h2>
-        <button id="closeScriptBtn" class="close-btn">&times;</button>
+  <!-- Logos -->
+  <section class="logos-section reveal">
+    <p>Used by faceless creators on</p>
+    <div class="logo-grid">
+      <span>YouTube</span>
+      <span>TikTok</span>
+      <span>Instagram Reels</span>
+      <span>YouTube Shorts</span>
+      <span>Twitter/X</span>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="feature-section reveal" id="features">
+    <p class="section-label">Why HookForge</p>
+    <h2>AI hooks that actually<br><span class="gradient-text">make people watch</span></h2>
+    <p class="section-desc">Every hook is engineered for maximum first-5-second retention. No generic advice. No fluff. Just hooks that convert viewers into subscribers.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <h3>5-Second Retention</h3>
+        <p>Every hook is designed to keep viewers watching past the critical first 5 seconds of your video.</p>
       </div>
-      <div id="scriptContent" class="script-content">
-        <div class="script-loading">
-          <span class="spinner"></span>
-          <span>Writing your script...</span>
+      <div class="feature-card">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <h3>4 Style Modes</h3>
+        <p>Choose from Curiosity, Shock, Authority, or Story — or combine them for maximum impact.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </div>
+        <h3>One-Click Copy</h3>
+        <p>Copy any hook instantly to your clipboard. Paste it directly into your script or teleprompter.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3>Instant Results</h3>
+        <p>Get 5 viral hooks in under 5 seconds. No signup, no waiting, no limits on quality.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>No Account Needed</h3>
+        <p>Start generating immediately. We don't ask for emails, passwords, or any personal information.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <h3>Built for Faceless Channels</h3>
+        <p>Optimized specifically for faceless YouTube content where the hook is everything.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it Works -->
+  <section class="how-section reveal" id="how-it-works">
+    <h2>3 steps to viral <span class="gradient-text">hooks</span></h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Enter Your Topic</h3>
+        <p>Type the topic of your YouTube video — anything from "dark psychology" to "AI productivity tools."</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Pick Your Style</h3>
+        <p>Select one or more hook styles: Curiosity, Shock, Authority, or Story to match your content.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Get 5 Hooks</h3>
+        <p>Receive 5 irresistible hooks in seconds. Copy the best ones and paste into your video script.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials-section reveal" id="testimonials">
+    <h2>Loved by <span class="gradient-text">creators</span></h2>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <p class="quote">"I went from 200 views per video to 50K+ in a month. The hooks from this tool changed everything for my faceless channel."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:#7c3aed;">MK</div>
+          <div>
+            <div class="testimonial-name">Marcus K.</div>
+            <div class="testimonial-role">Faceless channel, 120K subs</div>
+          </div>
         </div>
       </div>
-      <div class="script-actions">
-        <button id="copyScriptBtn" class="script-copy-btn" style="display:none;">Copy Full Script</button>
+      <div class="testimonial-card">
+        <p class="quote">"I use this before every single video. My retention rate jumped from 28% to 52%. Absolute game-changer."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:#ec4899;">SR</div>
+          <div>
+            <div class="testimonial-name">Sarah R.</div>
+            <div class="testimonial-role">Mystery storytelling channel</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="quote">"As someone who runs 3 faceless channels, this tool saves me hours of brainstorming. The hooks are always on point."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:#f59e0b;">JT</div>
+          <div>
+            <div class="testimonial-name">James T.</div>
+            <div class="testimonial-role">Multi-channel creator</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="cta-banner reveal">
+    <div class="cta-banner-inner">
+      <h2>Ready to go viral?</h2>
+      <p>Generate your first 5 viral hooks right now. It's free.</p>
+      <a href="#generator" class="modal-btn-primary" style="display:inline-block;padding:0.95rem 2.5rem;">Get Free Hooks</a>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section reveal" id="faq">
+    <h2>Got questions?</h2>
+    <div class="faq-item">
+      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+        Is HookForge really free?
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="faq-answer"><p>Yes! You get 3 free generations. After that, you can unlock unlimited access for a one-time $9 payment. No subscriptions, no hidden fees.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+        What makes these hooks different?
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="faq-answer"><p>Every hook is specifically engineered for faceless YouTube channels. They're capped at 12 words, designed for first-5-second retention, and avoid generic phrases that viewers scroll past.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+        Do I need to create an account?
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="faq-answer"><p>No account, no email, no login. Just type your topic, pick a style, and get hooks instantly. We respect your privacy.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+        What styles should I choose?
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="faq-answer"><p>Curiosity works great for most content. Shock is perfect for controversial topics. Authority builds trust for educational content. Story creates emotional connection. You can select multiple styles for combined effects.</p></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-left">HookForge &copy; 2026. Built for faceless creators.</div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#faq">FAQ</a>
+        <a href="#generator">Generator</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Paywall Modal -->
+  <div class="modal-overlay" id="paywallModal">
+    <div class="modal-box">
+      <div class="modal-icon">🔒</div>
+      <h2>Get Unlimited Hooks</h2>
+      <p class="modal-sub">One-time payment. Lifetime access.</p>
+      <div class="modal-price">$9 <span>one-time</span></div>
+      <div class="modal-actions">
+        <a href="https://yourusername.gumroad.com/l/hooks" target="_blank" rel="noopener noreferrer" class="modal-btn-primary">Unlock Now</a>
+        <button type="button" class="modal-btn-secondary" onclick="unlockPaid()">I've Paid &ndash; Unlock</button>
+      </div>
+      <div class="modal-trust">
+        <span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Secure checkout via Gumroad
+        </span>
+        <span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Instant access after purchase
+        </span>
       </div>
     </div>
   </div>
 
-  <div id="paywallModal" class="paywall-overlay" style="display:none;">
-    <div class="paywall-modal">
-      <div class="paywall-header">
-        <h2>Get Unlimited Hooks</h2>
-        <p>One-time payment. Lifetime access.</p>
-      </div>
-      <div class="paywall-price">$9</div>
-      <a href="https://yourusername.gumroad.com/l/hooks" target="_blank" rel="noopener noreferrer" class="paywall-btn paywall-btn-primary">Unlock Now</a>
-      <button id="paidBtn" class="paywall-btn paywall-btn-secondary">I've Paid - Unlock</button>
-      <div class="paywall-trust">
-        <span>Secure checkout via Gumroad</span>
-        <span>Instant access after purchase</span>
-      </div>
-    </div>
-  </div>
+  <script>
+    const FREE_LIMIT = 3;
 
-  <script src="script.js"></script>
+    const topicInput = document.getElementById('topic');
+    const generateBtn = document.getElementById('generateBtn');
+    const usageInfo = document.getElementById('usageInfo');
+    const genError = document.getElementById('genError');
+    const resultsSection = document.getElementById('resultsSection');
+    const hookList = document.getElementById('hookList');
+    const paywallModal = document.getElementById('paywallModal');
+    const stylePills = document.getElementById('stylePills');
+
+    let selectedStyles = [];
+
+    /* ── Navbar scroll ── */
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    /* ── Scroll reveal ── */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+    /* ── Storage helpers ── */
+    function getUsageCount() { return parseInt(localStorage.getItem('usageCount') || '0', 10); }
+    function setUsageCount(n) { localStorage.setItem('usageCount', String(n)); }
+    function isPaid() { return localStorage.getItem('paid') === 'true'; }
+
+    function updateUsageDisplay() {
+      if (isPaid()) { usageInfo.textContent = 'Unlimited access active'; return; }
+      const remaining = FREE_LIMIT - getUsageCount();
+      usageInfo.textContent = remaining > 0 ? `${remaining} free generation${remaining !== 1 ? 's' : ''} remaining` : 'Free limit reached';
+    }
+
+    /* ── Style pills ── */
+    stylePills.addEventListener('click', (e) => {
+      const pill = e.target.closest('.style-pill');
+      if (!pill) return;
+      const style = pill.dataset.style;
+      pill.classList.toggle('selected');
+      if (selectedStyles.includes(style)) selectedStyles = selectedStyles.filter((s) => s !== style);
+      else selectedStyles.push(style);
+    });
+
+    /* ── Error ── */
+    function showError(msg) { genError.textContent = msg; genError.classList.add('visible'); setTimeout(() => genError.classList.remove('visible'), 6000); }
+
+    /* ── Paywall ── */
+    function showPaywall() { paywallModal.classList.add('active'); }
+    function hidePaywall() { paywallModal.classList.remove('active'); }
+    paywallModal.addEventListener('click', (e) => { if (e.target === paywallModal) hidePaywall(); });
+
+    function unlockPaid() {
+      localStorage.setItem('paid', 'true');
+      setUsageCount(0);
+      updateUsageDisplay();
+      hidePaywall();
+      hookList.parentElement.classList.remove('blurred-results');
+      generateBtn.disabled = false;
+    }
+
+    /* ── Parse hooks ── */
+    function parseHooks(text) {
+      const lines = text.split('\n').filter((l) => l.trim());
+      const hooks = [];
+      for (const line of lines) {
+        const cleaned = line.replace(/^\d+[\.\)\-\s]+/, '').trim();
+        if (cleaned.length > 5) hooks.push(cleaned);
+      }
+      return hooks.length > 0 ? hooks.slice(0, 5) : [text.trim()];
+    }
+
+    /* ── Render ── */
+    function renderHooks(hooks) {
+      hookList.innerHTML = '';
+      hooks.forEach((hook, i) => {
+        const item = document.createElement('div');
+        item.className = 'hook-item';
+        item.innerHTML = `
+          <div class="hook-num">${i + 1}</div>
+          <p class="hook-text">${hook}</p>
+          <button class="hook-copy" onclick="copyHook(this)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+        `;
+        item._hookText = hook;
+        hookList.appendChild(item);
+      });
+      resultsSection.style.display = 'block';
+      setTimeout(() => resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+    function copyHook(btn) {
+      const text = btn.parentElement.querySelector('.hook-text').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copied');
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied`;
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+        }, 1500);
+      });
+    }
+
+    /* ── Generate ── */
+    async function generateHooks() {
+      genError.classList.remove('visible');
+
+      const topic = topicInput.value.trim();
+      if (!topic) { showError('Please enter a video topic.'); return; }
+
+      if (!isPaid() && getUsageCount() >= FREE_LIMIT) { showPaywall(); return; }
+
+      generateBtn.classList.add('loading');
+      generateBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic, styles: selectedStyles.length > 0 ? selectedStyles : ['Curiosity'] }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to generate hooks. Please try again.');
+
+        const hooks = parseHooks(data.text);
+
+        if (!isPaid()) {
+          setUsageCount(getUsageCount() + 1);
+          updateUsageDisplay();
+          if (getUsageCount() >= FREE_LIMIT) {
+            renderHooks(hooks);
+            hookList.parentElement.classList.add('blurred-results');
+            setTimeout(showPaywall, 800);
+            return;
+          }
+        }
+
+        hookList.parentElement.classList.remove('blurred-results');
+        renderHooks(hooks);
+      } catch (err) {
+        showError(err.message || 'Something went wrong. Please try again.');
+      } finally {
+        generateBtn.classList.remove('loading');
+        generateBtn.disabled = false;
+      }
+    }
+
+    topicInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') generateHooks(); });
+
+    /* ── FAQ ── */
+    document.querySelectorAll('.faq-question').forEach((btn) => {
+      btn.addEventListener('click', () => btn.parentElement.classList.toggle('open'));
+    });
+
+    updateUsageDisplay();
+  </script>
 </body>
 </html>
