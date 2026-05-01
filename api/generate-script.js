@@ -1,20 +1,16 @@
 export const maxDuration = 60;
 
-export default async function handler(request) {
-  if (request.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' }
-    });
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
-  const { hook, topic, style } = await request.json();
+  const { hook, topic, style } = req.body;
 
   if (!hook || !topic) {
-    return new Response(JSON.stringify({ error: 'Hook and topic are required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    res.status(400).json({ error: 'Hook and topic are required' });
+    return;
   }
 
   const prompt = `You are an expert YouTube scriptwriter for faceless channels. Write a full, engaging YouTube script based on this hook.
@@ -36,7 +32,7 @@ Script requirements:
 - Use conversational tone
 
 Format:
-[H00K] Opening line
+[HOOK] Opening line
 [SECTION 1] First key point
 [SECTION 2] Second key point
 [SECTION 3] Third key point
@@ -62,23 +58,18 @@ Make every second count. Write it now.`;
     });
 
     if (!response.ok) {
-      return new Response(JSON.stringify({ error: 'AI service error. Please try again.' }), {
-        status: 502,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const errText = await response.text();
+      console.error('OpenRouter error:', errText);
+      res.status(502).json({ error: 'AI service error. Please try again.' });
+      return;
     }
 
     const data = await response.json();
     const generatedText = data.choices?.[0]?.message?.content || '';
 
-    return new Response(JSON.stringify({ script: generatedText }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    res.status(200).json({ script: generatedText });
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    console.error('Script generation error:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
