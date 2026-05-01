@@ -4,12 +4,17 @@ const generateBtn = document.getElementById('generateBtn');
 const resultsContainer = document.getElementById('resultsContainer');
 const results = document.getElementById('results');
 const error = document.getElementById('error');
+const scriptModal = document.getElementById('scriptModal');
+const scriptContent = document.getElementById('scriptContent');
+const closeScriptBtn = document.getElementById('closeScriptBtn');
+const copyScriptBtn = document.getElementById('copyScriptBtn');
 const paywallModal = document.getElementById('paywallModal');
 const paidBtn = document.getElementById('paidBtn');
 
 const FREE_LIMIT = 3;
 
 let selectedStyles = [];
+let currentScriptText = '';
 
 function getUsageCount() {
   return parseInt(localStorage.getItem('usageCount') || '0', 10);
@@ -79,6 +84,7 @@ function renderHooks(hooks) {
       <span class="hook-number">${i + 1}</span>
       <span class="hook-text">${escapeHtml(hook)}</span>
       <button class="copy-btn" data-hook="${escapeAttr(hook)}">Copy</button>
+      <button class="script-btn" data-hook="${escapeAttr(hook)}">Generate Script</button>
     `;
     results.appendChild(card);
   });
@@ -94,6 +100,13 @@ function renderHooks(hooks) {
           btn.classList.remove('copied');
         }, 2000);
       });
+    });
+  });
+
+  document.querySelectorAll('.script-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const hook = btn.getAttribute('data-hook');
+      generateScript(hook);
     });
   });
 }
@@ -202,3 +215,77 @@ topicInput.addEventListener('keydown', (e) => {
     generateHooks();
   }
 });
+
+closeScriptBtn.addEventListener('click', () => {
+  scriptModal.style.display = 'none';
+});
+
+scriptModal.addEventListener('click', (e) => {
+  if (e.target === scriptModal) {
+    scriptModal.style.display = 'none';
+  }
+});
+
+copyScriptBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(currentScriptText).then(() => {
+    copyScriptBtn.textContent = 'Copied!';
+    setTimeout(() => {
+      copyScriptBtn.textContent = 'Copy Full Script';
+    }, 2000);
+  });
+});
+
+async function generateScript(hook) {
+  scriptModal.style.display = 'flex';
+  scriptContent.innerHTML = `
+    <div class="script-loading">
+      <span class="spinner"></span>
+      <span>Writing your script...</span>
+    </div>
+  `;
+  copyScriptBtn.style.display = 'none';
+
+  const topic = topicInput.value.trim();
+  const style = selectedStyles.join(', ') || 'Curiosity';
+
+  try {
+    const response = await fetch('/api/generate-script', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hook, topic, style })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error || 'Failed to generate script.');
+    }
+
+    const data = await response.json();
+    currentScriptText = data.script;
+    const formattedScript = formatScript(data.script);
+    scriptContent.innerHTML = `<div class="script-body">${formattedScript}</div>`;
+    copyScriptBtn.style.display = 'block';
+  } catch (err) {
+    scriptContent.innerHTML = `<div class="script-error">${err.message}</div>`;
+  }
+}
+
+function formatScript(text) {
+  const lines = text.split('\n');
+  let html = '';
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      html += '<br>';
+      continue;
+    }
+    if (/^\[/.test(trimmed)) {
+      html += `<div class="script-section">${escapeHtml(trimmed)}</div>`;
+    } else if (/^\*\*|^\#/.test(trimmed)) {
+      html += `<div class="script-heading">${escapeHtml(trimmed.replace(/[\*\#]/g, ''))}</div>`;
+    } else {
+      html += `<div class="script-line">${escapeHtml(trimmed)}</div>`;
+    }
+  }
+  return html;
+}
