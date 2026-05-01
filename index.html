@@ -848,6 +848,181 @@
       animation: scaleIn 0.3s ease-out;
     }
 
+    .modal-box-wide {
+      max-width: 750px;
+      text-align: left;
+      padding: 0;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff, var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all var(--transition);
+    }
+
+    .modal-close:hover { background: var(--surface-2); color: var(--text); }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 150px;
+    }
+
+    .modal-body::-webkit-scrollbar { width: 6px; }
+    .modal-body::-webkit-scrollbar-track { background: transparent; }
+    .modal-body::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+    .modal-body::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .modal-footer .modal-btn-primary { width: 100%; }
+
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    .loading-state .spinner-lg {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--surface-3);
+      border-top-color: var(--accent-light);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    .script-content, .video-plan-content {
+      font-size: 0.92rem;
+      line-height: 1.75;
+      color: var(--text-secondary);
+    }
+
+    .script-content .scene-label, .video-plan-content .scene-label {
+      display: block;
+      padding: 0.7rem 1rem;
+      margin: 1.25rem 0 0.75rem 0;
+      background: rgba(124,58,237,0.1);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      font-weight: 700;
+      color: var(--accent-light);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .script-content .script-line, .video-plan-content .plan-line {
+      margin: 0.25rem 0;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      transition: background var(--transition);
+    }
+
+    .script-content .script-line:hover, .video-plan-content .plan-line:hover {
+      background: var(--surface-2);
+    }
+
+    .script-content .cta-line {
+      margin: 1.5rem 0 0.5rem 0;
+      padding: 0.75rem 1rem;
+      background: rgba(34,197,94,0.08);
+      border-left: 3px solid var(--success);
+      border-radius: 0 8px 8px 0;
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .video-plan-content .detail-row {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0.3rem 0;
+      font-size: 0.88rem;
+    }
+
+    .video-plan-content .detail-label {
+      flex-shrink: 0;
+      width: 100px;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding-top: 0.1rem;
+    }
+
+    .video-plan-content .detail-value {
+      flex: 1;
+      color: var(--text-secondary);
+    }
+
+    .video-plan-content .detail-value.search-term {
+      color: var(--accent-light);
+      font-weight: 500;
+    }
+
+    .hook-actions {
+      display: flex;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    .hook-btn-script, .hook-btn-video {
+      padding: 0.35rem 0.65rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .hook-btn-script:hover { background: rgba(124,58,237,0.15); border-color: var(--accent); color: var(--accent-light); }
+    .hook-btn-video:hover { background: rgba(16,185,129,0.15); border-color: var(--success); color: var(--success); }
+
     @keyframes scaleIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
@@ -1306,6 +1481,34 @@
     </div>
   </div>
 
+  <!-- Script Modal -->
+  <div class="modal-overlay" id="scriptModal">
+    <div class="modal-box modal-box-wide">
+      <div class="modal-header">
+        <h2>Full YouTube Script</h2>
+        <button type="button" class="modal-close" onclick="closeModal('scriptModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="scriptBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="modal-btn-primary" id="copyScriptBtn" style="display:none;" onclick="copyScript()">Copy Full Script</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Plan Modal -->
+  <div class="modal-overlay" id="videoPlanModal">
+    <div class="modal-box modal-box-wide">
+      <div class="modal-header">
+        <h2>Video Storyboard + B-Roll Plan</h2>
+        <button type="button" class="modal-close" onclick="closeModal('videoPlanModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="videoPlanBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="modal-btn-primary" id="copyVideoPlanBtn" style="display:none;" onclick="copyVideoPlan()">Copy Full Plan</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const FREE_LIMIT = 3;
 
@@ -1370,6 +1573,7 @@
     }
 
     /* ── Parse hooks ── */
+    function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
     function parseHooks(text) {
       const lines = text.split('\n').filter((l) => l.trim());
       const hooks = [];
@@ -1389,10 +1593,20 @@
         item.innerHTML = `
           <div class="hook-num">${i + 1}</div>
           <p class="hook-text">${hook}</p>
-          <button class="hook-copy" onclick="copyHook(this)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
-          </button>
+          <div class="hook-actions">
+            <button class="hook-btn-script" onclick="generateScript(this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Script
+            </button>
+            <button class="hook-btn-video" onclick="generateVideoPlan(this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Video Plan
+            </button>
+            <button class="hook-copy" onclick="copyHook(this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
         `;
         item._hookText = hook;
         hookList.appendChild(item);
@@ -1459,6 +1673,125 @@
     }
 
     topicInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') generateHooks(); });
+
+    /* ── Modal helpers ── */
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    document.querySelectorAll('.modal-overlay').forEach((m) => {
+      m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('active'); });
+    });
+
+    /* ── Script generation ── */
+    let currentScriptText = '';
+
+    async function generateScript(btn) {
+      const hook = btn.closest('.hook-item')._hookText;
+      openScriptModal();
+      await doGenerateScript(hook);
+    }
+
+    function openScriptModal() {
+      document.getElementById('scriptModal').classList.add('active');
+      document.getElementById('scriptBody').innerHTML = `<div class="loading-state"><span class="spinner-lg"></span><span>Writing your script...</span></div>`;
+      document.getElementById('copyScriptBtn').style.display = 'none';
+    }
+
+    async function doGenerateScript(hook) {
+      const topic = topicInput.value.trim();
+      const style = selectedStyles.length > 0 ? selectedStyles.join(', ') : 'Curiosity';
+      try {
+        const res = await fetch('/api/generate-script', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hook, topic, style }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to generate script.');
+        currentScriptText = data.script;
+        document.getElementById('scriptBody').innerHTML = `<div class="script-content">${formatScript(data.script)}</div>`;
+        document.getElementById('copyScriptBtn').style.display = 'block';
+      } catch (err) {
+        document.getElementById('scriptBody').innerHTML = `<p style="color:var(--danger);text-align:center;padding:2rem;">${err.message}</p>`;
+      }
+    }
+
+    function formatScript(text) {
+      return text.split('\n').map((line) => {
+        const t = line.trim();
+        if (!t) return '';
+        if (/^\[.*\]/.test(t)) return `<span class="scene-label">${escHtml(t)}</span>`;
+        if (/^\*{2}|^\#{1,3}/.test(t)) return `<div style="font-weight:700;color:var(--text);margin:0.75rem 0 0.35rem;">${escHtml(t.replace(/[\*\#]/g, ''))}</div>`;
+        return `<div class="script-line">${escHtml(t)}</div>`;
+      }).filter(Boolean).join('');
+    }
+
+    function copyScript() {
+      navigator.clipboard.writeText(currentScriptText).then(() => {
+        const btn = document.getElementById('copyScriptBtn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy Full Script'; }, 2000);
+      });
+    }
+
+    /* ── Video Plan generation ── */
+    let currentVideoPlanText = '';
+
+    async function generateVideoPlan(btn) {
+      const hook = btn.closest('.hook-item')._hookText;
+      openVideoPlanModal();
+      await doGenerateVideoPlan(hook);
+    }
+
+    function openVideoPlanModal() {
+      document.getElementById('videoPlanModal').classList.add('active');
+      document.getElementById('videoPlanBody').innerHTML = `<div class="loading-state"><span class="spinner-lg"></span><span>Creating your video plan...</span></div>`;
+      document.getElementById('copyVideoPlanBtn').style.display = 'none';
+    }
+
+    async function doGenerateVideoPlan(hook) {
+      const topic = topicInput.value.trim();
+      const style = selectedStyles.length > 0 ? selectedStyles.join(', ') : 'Curiosity';
+      try {
+        const res = await fetch('/api/generate-video-plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hook, topic, style }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to generate video plan.');
+        currentVideoPlanText = data.videoPlan;
+        document.getElementById('videoPlanBody').innerHTML = `<div class="video-plan-content">${formatVideoPlan(data.videoPlan)}</div>`;
+        document.getElementById('copyVideoPlanBtn').style.display = 'block';
+      } catch (err) {
+        document.getElementById('videoPlanBody').innerHTML = `<p style="color:var(--danger);text-align:center;padding:2rem;">${err.message}</p>`;
+      }
+    }
+
+    function formatVideoPlan(text) {
+      return text.split('\n').map((line) => {
+        const t = line.trim();
+        if (!t) return '';
+        if (/^\[.*SCENE.*\]/i.test(t)) return `<span class="scene-label">${escHtml(t)}</span>`;
+        if (/^- \*\*(.+?)\*\*:?\s*(.*)/.test(t)) {
+          const match = t.match(/^- \*\*(.+?)\*\*:?\s*(.*)/);
+          return `<div class="detail-row"><span class="detail-label">${escHtml(match[1])}</span><span class="detail-value search-term">${escHtml(match[2] || '')}</span></div>`;
+        }
+        if (/^-(.+?):\s*(.+)/.test(t)) {
+          const match = t.match(/^-([A-Za-z ]+):\s*(.+)/);
+          if (match) return `<div class="detail-row"><span class="detail-label">${escHtml(match[1])}</span><span class="detail-value">${escHtml(match[2])}</span></div>`;
+        }
+        if (/^- /.test(t)) return `<div style="margin-left:1rem;margin:0.15rem 0;color:var(--text-muted);">• ${escHtml(t.slice(2))}</div>`;
+        if (/^\*{2}|^\#{1,3}/.test(t)) return `<div style="font-weight:700;color:var(--text);margin:1rem 0 0.5rem;">${escHtml(t.replace(/[\*\#]/g, ''))}</div>`;
+        return `<div class="plan-line">${escHtml(t)}</div>`;
+      }).filter(Boolean).join('');
+    }
+
+    function copyVideoPlan() {
+      navigator.clipboard.writeText(currentVideoPlanText).then(() => {
+        const btn = document.getElementById('copyVideoPlanBtn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy Full Plan'; }, 2000);
+      });
+    }
 
     /* ── FAQ ── */
     document.querySelectorAll('.faq-question').forEach((btn) => {
