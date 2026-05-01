@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Hook Generator for Faceless Channels</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Get Viral YouTube Hooks in 5 Seconds</h1>
+      <p class="subheadline">Increase retention. Get more views. No writing skills needed.</p>
+      <span class="trust-line">Used by 2,847+ faceless creators</span>
+    </header>
+
+    <main class="main">
+      <div class="input-section">
+        <label for="topic">Enter your video topic</label>
+        <input type="text" id="topic" placeholder="How to make money with AI in 2026" autocomplete="off">
+      </div>
+
+      <div class="styles-section">
+        <label>Select styles (multiple allowed)</label>
+        <div class="style-buttons" id="styleButtons">
+          <button class="style-btn" data-style="Curiosity">Curiosity</button>
+          <button class="style-btn" data-style="Shock">Shock</button>
+          <button class="style-btn" data-style="Authority">Authority</button>
+          <button class="style-btn" data-style="Story">Story</button>
+        </div>
+      </div>
+
+      <button id="generateBtn" class="generate-btn">
+        <span class="btn-text">Generate Hooks</span>
+        <span class="spinner" style="display:none;"></span>
+      </button>
+
+      <div id="error" class="error" style="display:none;"></div>
+
+      <div id="resultsContainer" class="results-container" style="display:none;">
+        <div id="results" class="results"></div>
+      </div>
+    </main>
+  </div>
+
+  <div id="paywallModal" class="paywall-overlay" style="display:none;">
+    <div class="paywall-modal">
+      <div class="paywall-header">
+        <h2>Get Unlimited Hooks</h2>
+        <p>One-time payment. Lifetime access.</p>
+      </div>
+      <div class="paywall-price">$9</div>
+      <a href="https://yourusername.gumroad.com/l/hooks" target="_blank" rel="noopener noreferrer" class="paywall-btn paywall-btn-primary">Unlock Now</a>
+      <button id="paidBtn" class="paywall-btn paywall-btn-secondary">I've Paid - Unlock</button>
+      <div class="paywall-trust">
+        <span>Secure checkout via Gumroad</span>
+        <span>Instant access after purchase</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
