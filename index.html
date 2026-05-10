@@ -1715,6 +1715,10 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to generate script.');
+        if (/I'm sorry|cannot help|can't help|not appropriate|inappropriate|against.*policy/i.test(data.script)) {
+          document.getElementById('scriptBody').innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:2rem;">This topic can\'t be processed. Try a different one.</p>';
+          return;
+        }
         currentScriptText = data.script;
         document.getElementById('scriptBody').innerHTML = `<div class="script-content">${formatScript(data.script)}</div>`;
         document.getElementById('copyScriptBtn').style.display = 'block';
@@ -1768,6 +1772,10 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to generate video plan.');
+        if (/I'm sorry|cannot help|can't help|not appropriate|inappropriate|against.*policy/i.test(data.videoPlan)) {
+          document.getElementById('videoPlanBody').innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:2rem;">This topic can\'t be processed. Try a different one.</p>';
+          return;
+        }
         currentVideoPlanText = data.videoPlan;
         document.getElementById('videoPlanBody').innerHTML = `<div class="video-plan-content">${formatVideoPlan(data.videoPlan)}</div>`;
         document.getElementById('copyVideoPlanBtn').style.display = 'block';
