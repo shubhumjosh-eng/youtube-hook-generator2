@@ -1665,7 +1665,13 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to generate hooks. Please try again.');
 
-        const hooks = parseHooks(data.text);
+        const text = data.text;
+        if (/I'm sorry|cannot help|can't help|not appropriate|inappropriate|against.*policy/i.test(text)) {
+          showError('This topic can\'t be processed. Try a different one.');
+          return;
+        }
+
+        const hooks = parseHooks(text);
         renderHooks(hooks);
       } catch (err) {
         showError(err.message || 'Something went wrong. Please try again.');
