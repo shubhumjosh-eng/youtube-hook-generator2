@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -481,12 +480,6 @@
 
     .hook-copy:hover { background: var(--surface-3); color: var(--text); }
     .hook-copy.copied { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--success); }
-
-    .blurred-results .hook-item .hook-text {
-      filter: blur(8px);
-      user-select: none;
-      pointer-events: none;
-    }
 
     /* ── Logo Marquee ── */
     .logos-section {
@@ -1127,281 +1120,6 @@
       gap: 0.35rem;
     }
 
-    /* ── Auth ── */
-    .auth-btn {
-      padding: 0.5rem 1rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-secondary);
-      font-size: 0.875rem;
-      font-weight: 500;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-
-    .auth-btn:hover { border-color: var(--accent-light); color: var(--text); }
-
-    .auth-btn-primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-
-    .auth-btn-primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
-
-    .user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.8rem;
-      cursor: pointer;
-      position: relative;
-      background: var(--accent);
-      color: #fff;
-      border: 2px solid transparent;
-      transition: border-color var(--transition);
-    }
-
-    .user-avatar:hover { border-color: var(--accent-light); }
-
-    .user-dropdown {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 0.5rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0.5rem;
-      min-width: 180px;
-      display: none;
-      z-index: 200;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-
-    .user-dropdown.open { display: block; }
-
-    .user-dropdown .dropdown-email {
-      padding: 0.5rem 0.75rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 0.25rem;
-      word-break: break-all;
-    }
-
-    .user-dropdown button {
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      font-family: inherit;
-      cursor: pointer;
-      text-align: left;
-      border-radius: 6px;
-      transition: all var(--transition);
-    }
-
-    .user-dropdown button:hover { background: var(--surface-2); color: var(--text); }
-
-    .user-dropdown .dropdown-danger:hover { color: var(--danger); }
-
-    /* ── Auth Modal ── */
-    .auth-tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      background: var(--surface-2);
-      padding: 0.25rem;
-      border-radius: var(--radius);
-    }
-
-    .auth-tab {
-      flex: 1;
-      padding: 0.6rem;
-      background: transparent;
-      border: none;
-      border-radius: 8px;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-
-    .auth-tab.active { background: var(--surface-3); color: var(--text); }
-
-    .auth-field {
-      margin-bottom: 1rem;
-      text-align: left;
-    }
-
-    .auth-field label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 0.35rem;
-    }
-
-    .auth-field input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text);
-      font-size: 0.95rem;
-      font-family: inherit;
-      transition: border-color var(--transition);
-    }
-
-    .auth-field input:focus { outline: none; border-color: var(--accent); }
-
-    .auth-error {
-      background: rgba(239,68,68,0.1);
-      border: 1px solid rgba(239,68,68,0.25);
-      border-radius: var(--radius);
-      padding: 0.6rem 0.75rem;
-      color: #fca5a5;
-      font-size: 0.8rem;
-      margin-top: 0.75rem;
-      display: none;
-    }
-
-    .auth-error.visible { display: block; }
-
-    .auth-divider {
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin: 1rem 0;
-      position: relative;
-    }
-
-    .auth-divider::before,
-    .auth-divider::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: 42%;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .auth-divider::before { left: 0; }
-    .auth-divider::after { right: 0; }
-
-    /* ── History ── */
-    .history-section {
-      max-width: 680px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-
-    .history-section h2 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-
-    .history-empty {
-      text-align: center;
-      padding: 3rem;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    .history-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1rem 1.25rem;
-      margin-bottom: 0.75rem;
-      transition: border-color var(--transition);
-    }
-
-    .history-item:hover { border-color: var(--border-hover); }
-
-    .history-item-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-    }
-
-    .history-type {
-      padding: 0.2rem 0.5rem;
-      background: rgba(124,58,237,0.12);
-      border-radius: 4px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: var(--accent-light);
-      text-transform: uppercase;
-    }
-
-    .history-date {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .history-topic {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-
-    .history-view {
-      margin-top: 0.5rem;
-      padding: 0.35rem 0.75rem;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-
-    .history-view:hover { background: var(--surface-3); color: var(--text); }
-
-    .history-loading, .history-error {
-      text-align: center;
-      padding: 2rem;
-      color: var(--text-muted);
-    }
-
-    .history-pagination {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
-
-    .history-page-btn {
-      padding: 0.4rem 0.75rem;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text-secondary);
-      font-size: 0.8rem;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-
-    .history-page-btn:hover { background: var(--surface-3); color: var(--text); }
-    .history-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
     /* ── Responsive ── */
     @media (max-width: 768px) {
       .navbar-links { display: none; }
@@ -1478,18 +1196,6 @@
         <a href="#how-it-works">How It Works</a>
         <a href="#testimonials">Testimonials</a>
         <a href="#faq">FAQ</a>
-        <a href="#history" id="navHistoryLink" style="display:none;">History</a>
-      </div>
-      <div id="navAuth">
-        <button type="button" class="auth-btn auth-btn-primary" id="navSignInBtn" onclick="openAuthModal()">Sign In</button>
-      </div>
-      <div id="navUser" style="display:none;position:relative;">
-        <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">U</div>
-        <div class="user-dropdown" id="userDropdown">
-          <div class="dropdown-email" id="userEmail">user@email.com</div>
-          <button onclick="showHistory()">My History</button>
-          <button class="dropdown-danger" onclick="signOut()">Sign Out</button>
-        </div>
       </div>
       <a href="#generator" class="navbar-cta">Get Free Hooks</a>
       <button class="mobile-toggle" onclick="document.getElementById('mobileNav').classList.toggle('open')" aria-label="Menu">
@@ -1700,16 +1406,6 @@
     </div>
   </section>
 
-  <!-- History -->
-  <section class="history-section" id="historySection" style="display:none;">
-    <h2>Your Generation History</h2>
-    <div id="historyList"></div>
-    <div class="history-pagination" id="historyPagination" style="display:none;">
-      <button type="button" class="history-page-btn" id="historyPrev" onclick="loadHistory(historyPage - 1)">Previous</button>
-      <button type="button" class="history-page-btn" id="historyNext" onclick="loadHistory(historyPage + 1)">Next</button>
-    </div>
-  </section>
-
   <!-- FAQ -->
   <section class="faq-section reveal" id="faq">
     <h2>Got questions?</h2>
@@ -1718,7 +1414,7 @@
         Is HookForge really free?
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
-      <div class="faq-answer"><p>Yes! You get 3 free generations. After that, you can unlock unlimited access for a one-time $9 payment. No subscriptions, no hidden fees.</p></div>
+      <div class="faq-answer">        <p>Yes! Generating hooks is completely free and unlimited. You only pay if you want full YouTube scripts and video production plans — a one-time $9 payment, no subscriptions.</p></div>
     </div>
     <div class="faq-item">
       <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
@@ -1758,9 +1454,9 @@
   <!-- Paywall Modal -->
   <div class="modal-overlay" id="paywallModal">
     <div class="modal-box">
-      <div class="modal-icon">🔒</div>
-      <h2>Get Unlimited Hooks</h2>
-      <p class="modal-sub">One-time payment. Lifetime access.</p>
+      <div class="modal-icon">🎬</div>
+      <h2>Unlock Scripts &amp; Video Plans</h2>
+      <p class="modal-sub">Hooks are free forever. Upgrade to generate full YouTube scripts and professional video plans.</p>
       <div class="modal-price">$9 <span>one-time</span></div>
       <div class="modal-actions">
         <a href="https://yourusername.gumroad.com/l/hooks" target="_blank" rel="noopener noreferrer" class="modal-btn-primary">Unlock Now</a>
@@ -1775,48 +1471,6 @@
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           Instant access after purchase
         </span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Auth Modal -->
-  <div class="modal-overlay" id="authModal">
-    <div class="modal-box" style="max-width:400px;">
-      <div style="display:flex;justify-content:flex-end;margin-bottom:0.5rem;">
-        <button type="button" class="modal-close" onclick="closeModal('authModal')" style="font-size:1.5rem;background:none;border:none;color:var(--text-secondary);cursor:pointer;">&times;</button>
-      </div>
-      <div class="auth-tabs">
-        <button type="button" class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">Sign In</button>
-        <button type="button" class="auth-tab" id="signupTab" onclick="switchAuthTab('signup')">Sign Up</button>
-      </div>
-      <div id="authLoginForm">
-        <div class="auth-field">
-          <label>Email</label>
-          <input type="email" id="loginEmail" placeholder="you@example.com" />
-        </div>
-        <div class="auth-field">
-          <label>Password</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" />
-        </div>
-        <button type="button" class="modal-btn-primary" onclick="signInWithEmail()">Sign In</button>
-        <div class="auth-error" id="authError"></div>
-        <div class="auth-divider">or</div>
-        <button type="button" class="modal-btn-secondary" onclick="signInWithGoogle()" style="border:1px solid var(--border);background:var(--surface-2);">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:0.5rem;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-          Continue with Google
-        </button>
-      </div>
-      <div id="authSignupForm" style="display:none;">
-        <div class="auth-field">
-          <label>Email</label>
-          <input type="email" id="signupEmail" placeholder="you@example.com" />
-        </div>
-        <div class="auth-field">
-          <label>Password</label>
-          <input type="password" id="signupPassword" placeholder="At least 6 characters" />
-        </div>
-        <button type="button" class="modal-btn-primary" onclick="signUpWithEmail()">Create Account</button>
-        <div class="auth-error" id="authSignupError"></div>
       </div>
     </div>
   </div>
@@ -1850,37 +1504,6 @@
   </div>
 
   <script>
-    const FREE_LIMIT = 3;
-
-    /* ── Supabase Init ── */
-    let supabaseClient = null;
-    let currentUser = null;
-
-    // Fetch Supabase config from server (set via Vercel env vars)
-    (async function initSupabase() {
-      try {
-        const res = await fetch('/api/config');
-        const cfg = await res.json();
-        if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
-          const { createClient } = window.supabase;
-          supabaseClient = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
-          // Check existing session
-          const { data: { session } } = await supabaseClient.auth.getSession();
-          if (session) {
-            currentUser = session.user;
-            onAuthChange(session.user);
-          }
-          // Listen for auth changes
-          supabaseClient.auth.onAuthStateChange((event, session) => {
-            currentUser = session?.user || null;
-            onAuthChange(session?.user || null);
-          });
-        }
-      } catch (e) {
-        // Config not available — auth features disabled
-      }
-    })();
-
     const topicInput = document.getElementById('topic');
     const generateBtn = document.getElementById('generateBtn');
     const usageInfo = document.getElementById('usageInfo');
@@ -1904,14 +1527,10 @@
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
     /* ── Storage helpers ── */
-    function getUsageCount() { return parseInt(localStorage.getItem('usageCount') || '0', 10); }
-    function setUsageCount(n) { localStorage.setItem('usageCount', String(n)); }
     function isPaid() { return localStorage.getItem('paid') === 'true'; }
 
     function updateUsageDisplay() {
-      if (isPaid()) { usageInfo.textContent = 'Unlimited access active'; return; }
-      const remaining = FREE_LIMIT - getUsageCount();
-      usageInfo.textContent = remaining > 0 ? `${remaining} free generation${remaining !== 1 ? 's' : ''} remaining` : 'Free limit reached';
+      usageInfo.textContent = isPaid() ? 'Scripts & video plans unlocked' : 'Free — generate unlimited hooks';
     }
 
     /* ── Style pills ── */
@@ -1934,11 +1553,8 @@
 
     function unlockPaid() {
       localStorage.setItem('paid', 'true');
-      setUsageCount(0);
       updateUsageDisplay();
       hidePaywall();
-      hookList.parentElement.classList.remove('blurred-results');
-      generateBtn.disabled = false;
     }
 
     /* ── Parse hooks ── */
@@ -2003,8 +1619,6 @@
       const topic = topicInput.value.trim();
       if (!topic) { showError('Please enter a video topic.'); return; }
 
-      if (!isPaid() && getUsageCount() >= FREE_LIMIT) { showPaywall(); return; }
-
       generateBtn.classList.add('loading');
       generateBtn.disabled = true;
 
@@ -2019,23 +1633,7 @@
         if (!res.ok) throw new Error(data.error || 'Failed to generate hooks. Please try again.');
 
         const hooks = parseHooks(data.text);
-
-        if (!isPaid()) {
-          setUsageCount(getUsageCount() + 1);
-          updateUsageDisplay();
-          if (getUsageCount() >= FREE_LIMIT) {
-            renderHooks(hooks);
-            hookList.parentElement.classList.add('blurred-results');
-            setTimeout(showPaywall, 800);
-            return;
-          }
-        }
-
-        hookList.parentElement.classList.remove('blurred-results');
         renderHooks(hooks);
-
-        // Save to Supabase
-        saveGeneration({ type: 'hooks', topic, styles: selectedStyles.length > 0 ? selectedStyles : ['Curiosity'], hooks });
       } catch (err) {
         showError(err.message || 'Something went wrong. Please try again.');
       } finally {
@@ -2055,6 +1653,7 @@
     let currentScriptText = '';
 
     async function generateScript(btn) {
+      if (!isPaid()) { showPaywall(); return; }
       const hook = btn.closest('.hook-item')._hookText;
       openScriptModal();
       await doGenerateScript(hook);
@@ -2080,7 +1679,6 @@
         currentScriptText = data.script;
         document.getElementById('scriptBody').innerHTML = `<div class="script-content">${formatScript(data.script)}</div>`;
         document.getElementById('copyScriptBtn').style.display = 'block';
-        saveGeneration({ type: 'script', topic, styles: selectedStyles.length > 0 ? selectedStyles : ['Curiosity'], hook, script: data.script });
       } catch (err) {
         document.getElementById('scriptBody').innerHTML = `<p style="color:var(--danger);text-align:center;padding:2rem;">${err.message}</p>`;
       }
@@ -2108,6 +1706,7 @@
     let currentVideoPlanText = '';
 
     async function generateVideoPlan(btn) {
+      if (!isPaid()) { showPaywall(); return; }
       const hook = btn.closest('.hook-item')._hookText;
       openVideoPlanModal();
       await doGenerateVideoPlan(hook);
@@ -2133,7 +1732,6 @@
         currentVideoPlanText = data.videoPlan;
         document.getElementById('videoPlanBody').innerHTML = `<div class="video-plan-content">${formatVideoPlan(data.videoPlan)}</div>`;
         document.getElementById('copyVideoPlanBtn').style.display = 'block';
-        saveGeneration({ type: 'video_plan', topic, styles: selectedStyles.length > 0 ? selectedStyles : ['Curiosity'], hook, videoPlan: data.videoPlan });
       } catch (err) {
         document.getElementById('videoPlanBody').innerHTML = `<p style="color:var(--danger);text-align:center;padding:2rem;">${err.message}</p>`;
       }
@@ -2173,200 +1771,9 @@
 
     updateUsageDisplay();
 
-    /* ── Auth Functions ── */
-    let historyPage = 0;
-    const HISTORY_PAGE_SIZE = 10;
-
-    function onAuthChange(user) {
-      if (user) {
-        document.getElementById('navSignInBtn').style.display = 'none';
-        document.getElementById('navUser').style.display = 'block';
-        document.getElementById('navHistoryLink').style.display = 'inline';
-        document.getElementById('userEmail').textContent = user.email;
-        document.getElementById('userAvatar').textContent = (user.email?.[0] || 'U').toUpperCase();
-      } else {
-        document.getElementById('navSignInBtn').style.display = '';
-        document.getElementById('navUser').style.display = 'none';
-        document.getElementById('navHistoryLink').style.display = 'none';
-      }
-    }
-
-    function openAuthModal() {
-      document.getElementById('authModal').classList.add('active');
-      document.getElementById('authError').classList.remove('visible');
-      document.getElementById('authSignupError').classList.remove('visible');
-    }
-
     function closeModal(id) {
       document.getElementById(id).classList.remove('active');
     }
-
-    function switchAuthTab(tab) {
-      document.getElementById('loginTab').classList.toggle('active', tab === 'login');
-      document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
-      document.getElementById('authLoginForm').style.display = tab === 'login' ? 'block' : 'none';
-      document.getElementById('authSignupForm').style.display = tab === 'signup' ? 'block' : 'none';
-    }
-
-    function showAuthError(msg) {
-      const el = document.getElementById('authError');
-      el.textContent = msg; el.classList.add('visible');
-    }
-
-    function showAuthSignupError(msg) {
-      const el = document.getElementById('authSignupError');
-      el.textContent = msg; el.classList.add('visible');
-    }
-
-    async function signInWithEmail() {
-      if (!supabaseClient) { showAuthError('Auth not available. Check Supabase config.'); return; }
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      if (!email || !password) { showAuthError('Please enter email and password.'); return; }
-      document.getElementById('authError').classList.remove('visible');
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if (error) { showAuthError(error.message); return; }
-      closeModal('authModal');
-    }
-
-    async function signUpWithEmail() {
-      if (!supabaseClient) { showAuthSignupError('Auth not available. Check Supabase config.'); return; }
-      const email = document.getElementById('signupEmail').value.trim();
-      const password = document.getElementById('signupPassword').value;
-      if (!email || !password) { showAuthSignupError('Please enter email and password.'); return; }
-      if (password.length < 6) { showAuthSignupError('Password must be at least 6 characters.'); return; }
-      document.getElementById('authSignupError').classList.remove('visible');
-      const { error } = await supabaseClient.auth.signUp({ email, password });
-      if (error) { showAuthSignupError(error.message); return; }
-      closeModal('authModal');
-      alert('Check your email for a confirmation link!');
-    }
-
-    async function signInWithGoogle() {
-      if (!supabaseClient) { showAuthError('Auth not available. Check Supabase config.'); return; }
-      const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
-      if (error) { showAuthError(error.message); }
-    }
-
-    function toggleDropdown() {
-      document.getElementById('userDropdown').classList.toggle('open');
-    }
-
-    // Close dropdown on outside click
-    document.addEventListener('click', (e) => {
-      const dd = document.getElementById('userDropdown');
-      if (dd && !e.target.closest('#userNav, #userAvatar, .user-dropdown')) {
-        dd.classList.remove('open');
-      }
-    });
-
-    async function signOut() {
-      if (!supabaseClient) return;
-      await supabaseClient.auth.signOut();
-      document.getElementById('userDropdown').classList.remove('open');
-    }
-
-    /* ── Save Generation to Supabase ── */
-    async function saveGeneration(data) {
-      if (!supabaseClient || !currentUser) return;
-      try {
-        await supabaseClient.from('generations').insert({
-          user_id: currentUser.id,
-          type: data.type,
-          topic: data.topic,
-          styles: data.styles || null,
-          hooks: data.hooks || null,
-          script: data.script || null,
-          video_plan: data.videoPlan || null
-        });
-      } catch (e) {
-        // Silent fail — save is best-effort
-      }
-    }
-
-    /* ── History ── */
-    async function showHistory() {
-      document.getElementById('userDropdown').classList.remove('open');
-      document.getElementById('historySection').style.display = 'block';
-      document.getElementById('historySection').scrollIntoView({ behavior: 'smooth' });
-      historyPage = 0;
-      await loadHistory(0);
-    }
-
-    async function loadHistory(page) {
-      if (!supabaseClient || !currentUser) return;
-      historyPage = page;
-      const list = document.getElementById('historyList');
-      list.innerHTML = '<div class="history-loading">Loading...</div>';
-
-      const from = page * HISTORY_PAGE_SIZE;
-      const to = from + HISTORY_PAGE_SIZE - 1;
-
-      const { data, error, count } = await supabaseClient
-        .from('generations')
-        .select('*', { count: 'exact' })
-        .eq('user_id', currentUser.id)
-        .order('created_at', { ascending: false })
-        .range(from, to);
-
-      if (error) {
-        list.innerHTML = `<div class="history-error">Failed to load history: ${error.message}</div>`;
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        list.innerHTML = '<div class="history-empty">No generations yet. Generate some hooks to see them here!</div>';
-        document.getElementById('historyPagination').style.display = 'none';
-        return;
-      }
-
-      list.innerHTML = '';
-      data.forEach((g) => {
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        const typeLabel = { hooks: 'Hooks', script: 'Script', video_plan: 'Video Plan' }[g.type] || g.type;
-        const date = new Date(g.created_at).toLocaleDateString();
-        const topicPreview = g.topic?.length > 50 ? g.topic.slice(0, 50) + '...' : g.topic;
-        item.innerHTML = `
-          <div class="history-item-header">
-            <span class="history-type">${typeLabel}</span>
-            <span class="history-date">${date}</span>
-          </div>
-          <div class="history-topic">${escHtml(topicPreview)}</div>
-          <button type="button" class="history-view" data-id="${g.id}">View</button>
-        `;
-        item.querySelector('.history-view').addEventListener('click', () => viewGeneration(g));
-        list.appendChild(item);
-      });
-
-      const totalPages = Math.ceil(count / HISTORY_PAGE_SIZE);
-      document.getElementById('historyPagination').style.display = totalPages > 1 ? 'flex' : 'none';
-      document.getElementById('historyPrev').disabled = page <= 0;
-      document.getElementById('historyNext').disabled = page >= totalPages - 1;
-    }
-
-    function viewGeneration(g) {
-      if (g.type === 'hooks' && g.hooks) {
-        renderHooks(g.hooks);
-        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
-      } else if (g.type === 'script' && g.script) {
-        currentScriptText = g.script;
-        document.getElementById('scriptModal').classList.add('active');
-        document.getElementById('scriptBody').innerHTML = `<div class="script-content">${formatScript(g.script)}</div>`;
-        document.getElementById('copyScriptBtn').style.display = 'block';
-      } else if (g.type === 'video_plan' && g.video_plan) {
-        currentVideoPlanText = g.video_plan;
-        document.getElementById('videoPlanModal').classList.add('active');
-        document.getElementById('videoPlanBody').innerHTML = `<div class="video-plan-content">${formatVideoPlan(g.video_plan)}</div>`;
-        document.getElementById('copyVideoPlanBtn').style.display = 'block';
-      }
-    }
-
-    // Close dropdown on scroll
-    window.addEventListener('scroll', () => {
-      const dd = document.getElementById('userDropdown');
-      if (dd) dd.classList.remove('open');
-    });
   </script>
 </body>
 </html>

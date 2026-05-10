@@ -57,7 +57,7 @@ Include at least 8-12 scenes. Make every visual decision intentional. No generic
         'X-Title': 'YouTube Hook Generator'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-oss-120b:free',
+        model: 'nvidia/nemotron-3-nano-30b-a3b:free',
         messages: [
           { role: 'user', content: prompt }
         ]
