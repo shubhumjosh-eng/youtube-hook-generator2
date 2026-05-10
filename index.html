@@ -1460,7 +1460,14 @@
       <div class="modal-price">$9 <span>one-time</span></div>
       <div class="modal-actions">
         <a href="https://ko-fi.com/shub465505" target="_blank" rel="noopener noreferrer" class="modal-btn-primary">Buy on Ko-fi ($9)</a>
-        <button type="button" class="modal-btn-secondary" onclick="unlockPaid()">I've Paid &ndash; Unlock</button>
+        <div style="margin-top:1rem;text-align:left;">
+          <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:0.35rem;">Already paid? Enter your unlock code:</label>
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="unlockCode" placeholder="HOOK-XXXX-XXXX" style="flex:1;padding:0.75rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:inherit;font-size:0.9rem;" />
+            <button type="button" class="modal-btn-primary" style="padding:0.75rem 1rem;width:auto;" onclick="redeemCode()">Unlock</button>
+          </div>
+          <div id="codeError" style="font-size:0.8rem;color:var(--danger);margin-top:0.35rem;display:none;"></div>
+        </div>
       </div>
       <div class="modal-trust">
         <span>
@@ -1551,7 +1558,33 @@
     function hidePaywall() { paywallModal.classList.remove('active'); }
     paywallModal.addEventListener('click', (e) => { if (e.target === paywallModal) hidePaywall(); });
 
-    function unlockPaid() {
+    const UNLOCK_CODES = {
+      'HOOK-A1B2-C3D4': true,
+      'HOOK-E5F6-G7H8': true,
+      'HOOK-I9J0-K1L2': true,
+      'HOOK-M3N4-O5P6': true,
+      'HOOK-Q7R8-S9T0': true,
+      'HOOK-U1V2-W3X4': true,
+      'HOOK-Y5Z6-A7B8': true,
+      'HOOK-C9D0-E1F2': true,
+      'HOOK-G3H4-I5J6': true,
+      'HOOK-K7L8-M9N0': true,
+    };
+    const USED_CODES_KEY = 'usedUnlockCodes';
+
+    function getUsedCodes() {
+      try { return JSON.parse(localStorage.getItem(USED_CODES_KEY) || '[]'); } catch { return []; }
+    }
+
+    function redeemCode() {
+      const input = document.getElementById('unlockCode').value.trim().toUpperCase();
+      const errEl = document.getElementById('codeError');
+      if (!input) { errEl.textContent = 'Please enter an unlock code.'; errEl.style.display = 'block'; return; }
+      if (!UNLOCK_CODES[input]) { errEl.textContent = 'Invalid code.'; errEl.style.display = 'block'; return; }
+      if (getUsedCodes().includes(input)) { errEl.textContent = 'Code already used.'; errEl.style.display = 'block'; return; }
+      const used = getUsedCodes();
+      used.push(input);
+      localStorage.setItem(USED_CODES_KEY, JSON.stringify(used));
       localStorage.setItem('paid', 'true');
       updateUsageDisplay();
       hidePaywall();
