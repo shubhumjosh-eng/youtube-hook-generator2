@@ -37,13 +37,12 @@ In the Vercel project settings:
 2. Vercel will auto-deploy from your `main` branch
 3. Wait ~30 seconds for deployment to complete
 
-### Step 5: Update Gumroad Link
+### Step 5: Update Payment Link
 
-1. Open `script.js` in your codebase
-2. Find `const GUMROAD_URL = '...'`
-3. Replace `https://yourusername.gumroad.com/l/hooks` with your actual Gumroad product link
-4. Also update the `paywall-btn-primary` href in `index.html`
-5. Push the change to GitHub (Vercel will auto-redeploy)
+1. The Ko-fi link is in the paywall modal in `index.html`
+2. Default is `https://ko-fi.com/shub465505`
+3. Replace with your own Ko-fi if needed
+4. Push changes to GitHub (Vercel auto-redeploys)
 
 ### Step 6: Custom Domain (Optional)
 
