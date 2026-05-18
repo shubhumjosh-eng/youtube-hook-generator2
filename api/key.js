@@ -50,9 +50,12 @@ export default async function handler(request) {
 
   const keyHex = process.env.REQUEST_ENCRYPTION_KEY;
   if (!keyHex) {
-    return new Response(JSON.stringify({ error: 'Encryption not configured' }), {
-      status: 501,
-      headers: { 'Content-Type': 'application/json' }
+    return new Response(JSON.stringify({ key: null }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, max-age=0'
+      }
     });
   }
 
