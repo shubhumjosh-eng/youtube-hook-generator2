@@ -1813,76 +1813,6 @@
     function getBestToken() { return getAuthToken() || getUnlockToken(); }
     function isPaid() { return !!getAuthToken() || !!getUnlockToken(); }
 
-    /* ── Request encryption ── */
-    let _encryptionKey = null;
-
-    async function _getEncryptionKey() {
-      if (_encryptionKey) return _encryptionKey;
-      try {
-        const res = await fetch('/api/key');
-        if (!res.ok) return null;
-        const data = await res.json();
-        _encryptionKey = data.key || null;
-        return _encryptionKey;
-      } catch {
-        return null;
-      }
-    }
-
-    function _hexToBytes(hex) {
-      const bytes = new Uint8Array(hex.length / 2);
-      for (let i = 0; i < hex.length; i += 2) {
-        bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
-      }
-      return bytes;
-    }
-
-    function _bytesToHex(bytes) {
-      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    async function _encryptData(data, keyHex) {
-      const rawKey = _hexToBytes(keyHex);
-      const key = await crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['encrypt']);
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const encoded = new TextEncoder().encode(JSON.stringify(data));
-      const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
-      return { iv: _bytesToHex(iv), data: _bytesToHex(new Uint8Array(ciphertext)) };
-    }
-
-    async function _decryptData(encrypted, keyHex) {
-      const rawKey = _hexToBytes(keyHex);
-      const key = await crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['decrypt']);
-      const iv = _hexToBytes(encrypted.iv);
-      const ciphertext = _hexToBytes(encrypted.data);
-      const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
-      return JSON.parse(new TextDecoder().decode(decrypted));
-    }
-
-    async function apiPost(url, data, extraHeaders) {
-      const keyHex = await _getEncryptionKey();
-      let body;
-      if (keyHex) {
-        body = JSON.stringify(await _encryptData(data, keyHex));
-      } else {
-        body = JSON.stringify(data);
-      }
-      const headers = { 'Content-Type': 'application/json', ...extraHeaders };
-      const res = await fetch(url, { method: 'POST', headers, body });
-      const raw = await res.json();
-      if (keyHex && raw && raw.iv && raw.data) {
-        try {
-          return { ok: res.ok, status: res.status, data: await _decryptData(raw, keyHex) };
-        } catch {
-          return { ok: false, status: 400, data: { error: 'Decryption failed' } };
-        }
-      }
-      return { ok: res.ok, status: res.status, data: raw };
-    }
-
-    /* ── Fetch encryption key on load ── */
-    _getEncryptionKey();
-
     function updateUsageDisplay() {
       usageInfo.textContent = isPaid() ? 'Scripts & video plans unlocked' : 'Free — generate unlimited hooks';
     }
@@ -1913,8 +1843,13 @@
       errEl.style.display = 'none';
       if (btn) btn.disabled = true;
       try {
-        const { ok, data } = await apiPost('/api/redeem', { code: input, clientId: getClientId() });
-        if (!ok) { errEl.textContent = data.error || 'Invalid code.'; errEl.style.display = 'block'; return; }
+        const res = await fetch('/api/redeem', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: input, clientId: getClientId() })
+        });
+        const data = await res.json();
+        if (!res.ok) { errEl.textContent = data.error || 'Invalid code.'; errEl.style.display = 'block'; return; }
         setUnlockToken(data.token);
         updateUsageDisplay();
         hidePaywall();
@@ -2011,8 +1946,13 @@
       btn.disabled = true;
       btn.textContent = 'Signing in...';
       try {
-        const { ok, data } = await apiPost('/api/auth/login', { email, password });
-        if (!ok) { errEl.textContent = data.error || 'Login failed.'; errEl.style.display = 'block'; return; }
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) { errEl.textContent = data.error || 'Login failed.'; errEl.style.display = 'block'; return; }
         setAuthToken(data.token);
         closeAuthModal();
         await checkAuth();
@@ -2036,8 +1976,13 @@
       btn.disabled = true;
       btn.textContent = 'Creating account...';
       try {
-        const { ok, data } = await apiPost('/api/auth/register', { email, password });
-        if (!ok) { errEl.textContent = data.error || 'Registration failed.'; errEl.style.display = 'block'; return; }
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) { errEl.textContent = data.error || 'Registration failed.'; errEl.style.display = 'block'; return; }
         setAuthToken(data.token);
         closeAuthModal();
         await checkAuth();
@@ -2127,8 +2072,14 @@
       generateBtn.disabled = true;
 
       try {
-        const { ok, data } = await apiPost('/api/generate', { topic, styles: selectedStyles.length > 0 ? selectedStyles : ['Curiosity'] });
-        if (!ok) throw new Error(data.error || 'Failed to generate hooks. Please try again.');
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic, styles: selectedStyles.length > 0 ? selectedStyles : ['Curiosity'] })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to generate hooks.');
 
         const text = data.text;
         if (/I'm sorry|cannot help|can't help|not appropriate|inappropriate|against.*policy/i.test(text)) {
@@ -2173,11 +2124,17 @@
       const topic = topicInput.value.trim();
       const style = selectedStyles.length > 0 ? selectedStyles.join(', ') : 'Curiosity';
       try {
-        const { ok, data } = await apiPost('/api/generate-script', { hook, topic, style }, {
-          'Authorization': `Bearer ${getBestToken()}`,
-          'X-Client-Id': getClientId()
+        const res = await fetch('/api/generate-script', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getBestToken()}`,
+            'X-Client-Id': getClientId()
+          },
+          body: JSON.stringify({ hook, topic, style })
         });
-        if (!ok) throw new Error(data.error || 'Failed to generate script.');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to generate script.');
         if (/I'm sorry|cannot help|can't help|not appropriate|inappropriate|against.*policy/i.test(data.script)) {
           document.getElementById('scriptBody').innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:2rem;">This topic can\'t be processed. Try a different one.</p>';
           return;
@@ -2228,11 +2185,17 @@
       const topic = topicInput.value.trim();
       const style = selectedStyles.length > 0 ? selectedStyles.join(', ') : 'Curiosity';
       try {
-        const { ok, data } = await apiPost('/api/generate-video-plan', { hook, topic, style }, {
-          'Authorization': `Bearer ${getBestToken()}`,
-          'X-Client-Id': getClientId()
+        const res = await fetch('/api/generate-video-plan', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getBestToken()}`,
+            'X-Client-Id': getClientId()
+          },
+          body: JSON.stringify({ hook, topic, style })
         });
-        if (!ok) throw new Error(data.error || 'Failed to generate video plan.');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to generate video plan.');
         if (/I'm sorry|cannot help|can't help|not appropriate|inappropriate|against.*policy/i.test(data.videoPlan)) {
           document.getElementById('videoPlanBody').innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:2rem;">This topic can\'t be processed. Try a different one.</p>';
           return;

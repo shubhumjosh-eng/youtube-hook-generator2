@@ -194,7 +194,6 @@ const ROUTES = {
   '/api/generate-video-plan': 'generate-video-plan.js',
   '/api/redeem': 'redeem.js',
   '/api/config': 'config.js',
-  '/api/key': 'key.js',
   '/api/auth/register': 'auth/register.js',
   '/api/auth/login': 'auth/login.js',
   '/api/auth/me': 'auth/me.js',

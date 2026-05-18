@@ -1,111 +1,62 @@
-import { encrypt, decryptEdgeRequest, isEncryptionConfigured, jsonError } from '../lib/_crypto.js';
+import { getFingerprint, checkRateLimit, sanitize, jsonError, checkOrigin } from '../lib/_security.js';
 
-const RATE_LIMIT_WINDOW = 60 * 1000;
-const MAX_REQUESTS = 10;
-const MAX_REQUEST_SIZE = 1024 * 10;
-const MAX_TOPIC_LENGTH = 200;
-const MAX_STYLES = 4;
+const ALLOWED_ORIGINS = [
+  'https://youtube-hook-generator2.vercel.app',
+  'https://youtube-hook-generator.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5000'
+];
 
-const rateLimitMap = new Map();
-
-function getClientIp(request) {
-  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || request.headers.get('x-real-ip')
-    || 'unknown';
-}
-
-function rateLimit(ip) {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW) {
-    rateLimitMap.set(ip, { count: 1, windowStart: now });
-    return { allowed: true, remaining: MAX_REQUESTS - 1 };
-  }
-  if (entry.count >= MAX_REQUESTS) {
-    return { allowed: false, remaining: 0 };
-  }
-  entry.count++;
-  return { allowed: true, remaining: MAX_REQUESTS - entry.count };
-}
-
-function sanitizeInput(str) {
-  return String(str).replace(/[<>&"'`]/g, '').trim().slice(0, MAX_TOPIC_LENGTH);
-}
-
-export const config = {
-  runtime: 'edge'
-};
+export const config = { runtime: 'edge' };
 
 export default async function handler(request) {
-  if (request.method !== 'POST') {
-    return jsonError(405, 'Method not allowed');
+  if (request.method !== 'POST') return jsonError(405, 'Method not allowed');
+
+  if (!checkOrigin(request, ALLOWED_ORIGINS)) {
+    return jsonError(403, 'Origin not allowed');
   }
 
-  const ip = getClientIp(request);
-  const { allowed, remaining } = rateLimit(ip);
+  const fp = getFingerprint(request);
+  const { allowed, remaining } = checkRateLimit(fp, false);
   if (!allowed) {
-    return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please wait before generating more hooks.' }), {
+    return new Response(JSON.stringify({ error: 'Rate limit exceeded. Wait 60 seconds.' }), {
       status: 429,
-      headers: {
-        'Content-Type': 'application/json',
-        'Retry-After': '60',
-        'X-RateLimit-Remaining': '0'
-      }
+      headers: { 'Content-Type': 'application/json', 'Retry-After': '60', 'X-RateLimit-Remaining': '0' }
     });
   }
 
   const contentLength = parseInt(request.headers.get('content-length') || '0', 10);
-  if (contentLength > MAX_REQUEST_SIZE) {
-    return jsonError(413, 'Request too large');
-  }
+  if (contentLength > 1024 * 10) return jsonError(413, 'Request too large');
 
   let body;
-  try {
-    body = await decryptEdgeRequest(request);
-  } catch {
-    return jsonError(400, 'Invalid request body');
-  }
-  if (!body) {
-    return jsonError(400, 'Decryption failed');
-  }
+  try { body = await request.json(); } catch { return jsonError(400, 'Invalid JSON'); }
+  if (!body || typeof body !== 'object') return jsonError(400, 'Invalid request body');
 
   const rawTopic = body.topic;
+  if (!rawTopic || typeof rawTopic !== 'string') return jsonError(400, 'Topic is required');
+
+  const topic = sanitize(rawTopic, 200);
+  if (topic.length < 2) return jsonError(400, 'Topic must be at least 2 characters');
+
   const rawStyles = body.styles;
-
-  if (!rawTopic || typeof rawTopic !== 'string') {
-    return jsonError(400, 'Topic is required and must be a string');
-  }
-
-  const topic = sanitizeInput(rawTopic);
-  if (topic.length < 2) {
-    return jsonError(400, 'Topic must be at least 2 characters');
-  }
-
+  const validStyles = ['Curiosity', 'Shock', 'Authority', 'Story'];
   let styles = ['Curiosity'];
   if (Array.isArray(rawStyles) && rawStyles.length > 0) {
-    const validStyles = ['Curiosity', 'Shock', 'Authority', 'Story'];
-    const filtered = rawStyles
-      .filter(s => typeof s === 'string' && validStyles.includes(s))
-      .slice(0, MAX_STYLES);
-    if (filtered.length > 0) {
-      styles = filtered;
-    }
+    const filtered = rawStyles.filter(s => typeof s === 'string' && validStyles.includes(s)).slice(0, 4);
+    if (filtered.length > 0) styles = filtered;
   }
 
   const prompt = `Generate 5 viral YouTube hooks for a faceless YouTube video.
 
 Topic: ${topic}
-
 Style: ${styles.join(', ')}
 
 Rules:
 * Max 12 words per hook
 * Extremely high curiosity
 * Designed for first 5 seconds retention
-* No fluff
-* No generic phrases
+* No fluff, no generic phrases
 * Make each hook irresistible
-
 Return as a numbered list.`;
 
   try {
@@ -114,49 +65,30 @@ Return as a numbered list.`;
       headers: {
         'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://youtube-hook-generator.vercel.app',
-        'X-Title': 'YouTube Hook Generator'
+        'HTTP-Referer': 'https://youtube-hook-generator2.vercel.app',
+        'X-Title': 'HookForge'
       },
       body: JSON.stringify({
         model: 'nvidia/nemotron-3-nano-30b-a3b:free',
-        messages: [
-          { role: 'user', content: prompt }
-        ]
+        messages: [{ role: 'user', content: prompt }]
       })
     });
 
     if (!response.ok) {
-      const errText = await response.text();
-      console.error('OpenRouter error:', errText);
+      await response.text();
       return jsonError(502, 'AI service error. Please try again.');
     }
 
     const data = await response.json();
-    const generatedText = data.choices?.[0]?.message?.content || '';
+    const text = data.choices?.[0]?.message?.content || '';
+    if (!text) return jsonError(502, 'Empty response. Try a different topic.');
 
-    if (!generatedText) {
-      return jsonError(502, 'AI returned empty response. Try a different topic.');
-    }
-
-    const result = { text: generatedText };
-    let responseBody;
-
-    if (isEncryptionConfigured()) {
-      const encrypted = await encrypt(result);
-      responseBody = JSON.stringify(encrypted);
-    } else {
-      responseBody = JSON.stringify(result);
-    }
-
-    return new Response(responseBody, {
+    return new Response(JSON.stringify({ text }), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-RateLimit-Remaining': String(remaining)
-      }
+      headers: { 'Content-Type': 'application/json', 'X-RateLimit-Remaining': String(remaining) }
     });
   } catch (err) {
-    console.error('Generation error:', err);
+    console.error('Generate error:', err);
     return jsonError(500, 'Internal server error');
   }
 }
