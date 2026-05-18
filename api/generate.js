@@ -1,4 +1,4 @@
-import { getFingerprint, checkRateLimit, sanitize, jsonError, checkOrigin } from '../lib/_security.js';
+import { applyRateLimit, sanitize, jsonError, checkOrigin } from '../lib/_security.js';
 
 const ALLOWED_ORIGINS = [
   'https://youtube-hook-generator2.vercel.app',
@@ -12,18 +12,10 @@ export const config = { runtime: 'edge' };
 export default async function handler(request) {
   if (request.method !== 'POST') return jsonError(405, 'Method not allowed');
 
-  if (!checkOrigin(request, ALLOWED_ORIGINS)) {
-    return jsonError(403, 'Origin not allowed');
-  }
+  if (!checkOrigin(request, ALLOWED_ORIGINS)) return jsonError(403, 'Origin not allowed');
 
-  const fp = getFingerprint(request);
-  const { allowed, remaining } = checkRateLimit(fp, false);
-  if (!allowed) {
-    return new Response(JSON.stringify({ error: 'Rate limit exceeded. Wait 60 seconds.' }), {
-      status: 429,
-      headers: { 'Content-Type': 'application/json', 'Retry-After': '60', 'X-RateLimit-Remaining': '0' }
-    });
-  }
+  const rl = applyRateLimit(request, '/api/generate', false);
+  if (rl) return rl;
 
   const contentLength = parseInt(request.headers.get('content-length') || '0', 10);
   if (contentLength > 1024 * 10) return jsonError(413, 'Request too large');
@@ -85,7 +77,7 @@ Return as a numbered list.`;
 
     return new Response(JSON.stringify({ text }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json', 'X-RateLimit-Remaining': String(remaining) }
+      headers: { 'Content-Type': 'application/json' }
     });
   } catch (err) {
     console.error('Generate error:', err);

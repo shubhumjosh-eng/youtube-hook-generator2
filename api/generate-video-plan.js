@@ -1,4 +1,4 @@
-import { getFingerprint, checkRateLimit, sanitize, checkOrigin, verifyToken } from '../lib/_security.js';
+import { applyRateLimit, sanitize, checkOrigin, verifyToken } from '../lib/_security.js';
 
 const ALLOWED_ORIGINS = [
   'https://youtube-hook-generator2.vercel.app',
@@ -7,41 +7,40 @@ const ALLOWED_ORIGINS = [
   'http://localhost:5000'
 ];
 
-export const maxDuration = 60;
+export const config = { runtime: 'edge' };
 
-export default async function handler(req, res) {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
+export default async function handler(request) {
+  if (request.method !== 'POST') return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
 
-  if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
+  if (!checkOrigin(request, ALLOWED_ORIGINS)) return new Response(JSON.stringify({ error: 'Origin not allowed' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
 
-  if (!checkOrigin(req, ALLOWED_ORIGINS)) { res.status(403).json({ error: 'Origin not allowed' }); return; }
+  const rl = applyRateLimit(request, '/api/generate-video-plan', false);
+  if (rl) return rl;
 
-  const fp = getFingerprint(req);
-  const { allowed } = checkRateLimit(fp, false);
-  if (!allowed) { res.status(429).json({ error: 'Rate limit exceeded.' }); return; }
-
-  const contentLength = parseInt(req.headers['content-length'] || '0', 10);
-  if (contentLength > 1024 * 100) { res.status(413).json({ error: 'Request too large' }); return; }
-
-  const authHeader = req.headers['authorization'] || '';
+  const authHeader = request.headers.get('authorization') || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
-  const clientId = req.headers['x-client-id'] || '';
+  const clientId = request.headers.get('x-client-id') || '';
 
   const session = await verifyToken(token);
-  if (!session) { res.status(403).json({ error: 'Unauthorized. Sign in or enter a valid unlock code.' }); return; }
+  if (!session) return new Response(JSON.stringify({ error: 'Unauthorized. Sign in or enter a valid unlock code.' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
 
   if (session.type === 'unlock' && session.clientId !== clientId) {
-    res.status(403).json({ error: 'Token does not match this session.' });
-    return;
+    return new Response(JSON.stringify({ error: 'Token does not match this session.' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const { topic, hook, style, script } = req.body || {};
-  if (!topic || typeof topic !== 'string') { res.status(400).json({ error: 'Topic is required' }); return; }
+  let body;
+  try { body = await request.json(); } catch { return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json' } }); }
+
+  const topic = body?.topic;
+  const hook = body?.hook || '';
+  const style = body?.style;
+  const script = body?.script || '';
+  if (!topic || typeof topic !== 'string') return new Response(JSON.stringify({ error: 'Topic is required' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
   const safeTopic = sanitize(topic, 200);
-  const safeHook = hook ? sanitize(String(hook), 200) : '';
-  const safeScript = script ? sanitize(String(script), 50000) : '';
-  if (safeTopic.length < 2) { res.status(400).json({ error: 'Topic too short' }); return; }
+  const safeHook = sanitize(String(hook), 200);
+  const safeScript = sanitize(String(script), 50000);
+  if (safeTopic.length < 2) return new Response(JSON.stringify({ error: 'Topic too short' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
   const validStyles = ['Curiosity', 'Shock', 'Authority', 'Story'];
   const safeStyle = validStyles.includes(style) ? style : 'Curiosity';
@@ -90,15 +89,15 @@ Include at least 8-12 scenes.`;
       })
     });
 
-    if (!response.ok) { await response.text(); res.status(502).json({ error: 'AI service error.' }); return; }
+    if (!response.ok) { await response.text(); return new Response(JSON.stringify({ error: 'AI service error.' }), { status: 502, headers: { 'Content-Type': 'application/json' } }); }
 
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content || '';
-    if (!text) { res.status(502).json({ error: 'Empty response.' }); return; }
+    if (!text) return new Response(JSON.stringify({ error: 'Empty response.' }), { status: 502, headers: { 'Content-Type': 'application/json' } });
 
-    res.status(200).json({ videoPlan: text });
+    return new Response(JSON.stringify({ videoPlan: text }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
     console.error('Video plan error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }

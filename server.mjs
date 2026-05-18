@@ -4,6 +4,13 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import crypto from 'crypto';
 
+/* ── Inject Web Crypto for edge-compatible modules ── */
+Object.defineProperty(globalThis, 'crypto', {
+  value: crypto.webcrypto,
+  writable: true,
+  configurable: true,
+});
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 

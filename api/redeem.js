@@ -1,4 +1,4 @@
-import { getFingerprint, checkRateLimit, sanitize, checkOrigin, jsonError } from '../lib/_security.js';
+import { applyRateLimit, sanitize, checkOrigin, jsonError } from '../lib/_security.js';
 
 const ALLOWED_ORIGINS = [
   'https://youtube-hook-generator2.vercel.app',
@@ -13,9 +13,8 @@ export default async function handler(request) {
   if (request.method !== 'POST') return jsonError(405, 'Method not allowed');
   if (!checkOrigin(request, ALLOWED_ORIGINS)) return jsonError(403, 'Origin not allowed');
 
-  const fp = getFingerprint(request);
-  const { allowed, remaining } = checkRateLimit(fp, false);
-  if (!allowed) return jsonError(429, 'Too many attempts. Wait 60 seconds.');
+  const rl = applyRateLimit(request, '/api/redeem', false);
+  if (rl) return rl;
 
   let body;
   try { body = await request.json(); } catch { return jsonError(400, 'Invalid JSON'); }

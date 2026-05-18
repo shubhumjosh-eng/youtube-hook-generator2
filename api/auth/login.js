@@ -1,29 +1,32 @@
 import { users, verifyPassword, createToken } from './_store.js';
-import { getFingerprint, checkRateLimit } from '../lib/_security.js';
+import { applyRateLimit, jsonError } from '../../lib/_security.js';
 
-export const maxDuration = 60;
+export const config = { runtime: 'edge' };
 
-export default async function handler(req, res) {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
+export default async function handler(request) {
+  if (request.method !== 'POST') return jsonError(405, 'Method not allowed');
 
-  const fp = getFingerprint(req);
-  if (!checkRateLimit(fp, false).allowed) { res.status(429).json({ error: 'Too many attempts.' }); return; }
+  const rl = applyRateLimit(request, '/api/auth/login', false);
+  if (rl) return rl;
 
-  const { email, password } = req.body || {};
-  if (!email || !password) { res.status(400).json({ error: 'Email and password required' }); return; }
+  let body;
+  try { body = await request.json(); } catch { return jsonError(400, 'Invalid JSON'); }
+
+  const email = body?.email;
+  const password = body?.password;
+  if (!email || !password) return jsonError(400, 'Email and password required');
 
   const normalizedEmail = email.toLowerCase().trim();
   const user = users.get(normalizedEmail);
-  if (!user) { res.status(401).json({ error: 'Invalid email or password' }); return; }
+  if (!user) return jsonError(401, 'Invalid email or password');
 
   try {
     const valid = await verifyPassword(password, user.salt, user.hash);
-    if (!valid) { res.status(401).json({ error: 'Invalid email or password' }); return; }
+    if (!valid) return jsonError(401, 'Invalid email or password');
     const token = await createToken(user.userId, normalizedEmail);
-    res.status(200).json({ success: true, token, user: { email: normalizedEmail } });
+    return new Response(JSON.stringify({ success: true, token, user: { email: normalizedEmail } }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    return jsonError(500, 'Internal server error');
   }
 }
