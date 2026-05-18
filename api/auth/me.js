@@ -1,5 +1,5 @@
 import { verifyToken, users } from './_store.js';
-import { encrypt, isEncryptionConfigured } from '../_crypto.js';
+import { encrypt, isEncryptionConfigured } from '../../lib/_crypto.js';
 
 export default async function handler(req, res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');

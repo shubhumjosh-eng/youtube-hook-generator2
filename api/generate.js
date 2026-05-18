@@ -1,4 +1,4 @@
-import { encrypt, decryptEdgeRequest, isEncryptionConfigured, jsonError } from '../_crypto.js';
+import { encrypt, decryptEdgeRequest, isEncryptionConfigured, jsonError } from '../lib/_crypto.js';
 
 const RATE_LIMIT_WINDOW = 60 * 1000;
 const MAX_REQUESTS = 10;

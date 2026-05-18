@@ -1,4 +1,4 @@
-import { encrypt, decryptRequest, isEncryptionConfigured } from '../_crypto.js';
+import { encrypt, decryptRequest, isEncryptionConfigured } from '../lib/_crypto.js';
 
 const RATE_LIMIT_WINDOW = 60 * 1000;
 const MAX_REQUESTS = 5;

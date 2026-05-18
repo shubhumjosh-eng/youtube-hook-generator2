@@ -1,7 +1,7 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import crypto from 'crypto';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -60,7 +60,7 @@ async function callApi(modulePath, req, res) {
 
   let mod;
   try {
-    mod = await import(fullPath);
+    mod = await import(pathToFileURL(fullPath).href);
   } catch (err) {
     console.error(`Import error (${modulePath}):`, err);
     res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -92,22 +92,21 @@ async function handleEdge(handler, req, res) {
     req.on('end', () => r(d));
   });
 
-  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const headersObj = {};
+  for (const [k, v] of Object.entries(req.headers)) {
+    headersObj[k] = v;
+  }
+  headersObj.get = function (key) { return this[key.toLowerCase()] || null; };
 
   const request = {
     method: req.method,
     url: req.url,
-    headers: new Map(Object.entries(req.headers)),
+    headers: headersObj,
     json: async () => {
       try { return JSON.parse(body); }
       catch { throw new Error('Invalid JSON'); }
     },
     text: async () => body,
-  };
-
-  request.headers.get = function (key) {
-    const val = this.get(key) || req.headers[key.toLowerCase()];
-    return val || null;
   };
 
   let response;
