@@ -1,29 +1,102 @@
+import { encrypt, decryptEdgeRequest, isEncryptionConfigured, jsonError } from '../_crypto.js';
+
+const RATE_LIMIT_WINDOW = 60 * 1000;
+const MAX_REQUESTS = 10;
+const MAX_REQUEST_SIZE = 1024 * 10;
+const MAX_TOPIC_LENGTH = 200;
+const MAX_STYLES = 4;
+
+const rateLimitMap = new Map();
+
+function getClientIp(request) {
+  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || request.headers.get('x-real-ip')
+    || 'unknown';
+}
+
+function rateLimit(ip) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(ip, { count: 1, windowStart: now });
+    return { allowed: true, remaining: MAX_REQUESTS - 1 };
+  }
+  if (entry.count >= MAX_REQUESTS) {
+    return { allowed: false, remaining: 0 };
+  }
+  entry.count++;
+  return { allowed: true, remaining: MAX_REQUESTS - entry.count };
+}
+
+function sanitizeInput(str) {
+  return String(str).replace(/[<>&"'`]/g, '').trim().slice(0, MAX_TOPIC_LENGTH);
+}
+
 export const config = {
   runtime: 'edge'
 };
 
 export default async function handler(request) {
   if (request.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' }
+    return jsonError(405, 'Method not allowed');
+  }
+
+  const ip = getClientIp(request);
+  const { allowed, remaining } = rateLimit(ip);
+  if (!allowed) {
+    return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please wait before generating more hooks.' }), {
+      status: 429,
+      headers: {
+        'Content-Type': 'application/json',
+        'Retry-After': '60',
+        'X-RateLimit-Remaining': '0'
+      }
     });
   }
 
-  const { topic, styles } = await request.json();
+  const contentLength = parseInt(request.headers.get('content-length') || '0', 10);
+  if (contentLength > MAX_REQUEST_SIZE) {
+    return jsonError(413, 'Request too large');
+  }
 
-  if (!topic) {
-    return new Response(JSON.stringify({ error: 'Topic is required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
+  let body;
+  try {
+    body = await decryptEdgeRequest(request);
+  } catch {
+    return jsonError(400, 'Invalid request body');
+  }
+  if (!body) {
+    return jsonError(400, 'Decryption failed');
+  }
+
+  const rawTopic = body.topic;
+  const rawStyles = body.styles;
+
+  if (!rawTopic || typeof rawTopic !== 'string') {
+    return jsonError(400, 'Topic is required and must be a string');
+  }
+
+  const topic = sanitizeInput(rawTopic);
+  if (topic.length < 2) {
+    return jsonError(400, 'Topic must be at least 2 characters');
+  }
+
+  let styles = ['Curiosity'];
+  if (Array.isArray(rawStyles) && rawStyles.length > 0) {
+    const validStyles = ['Curiosity', 'Shock', 'Authority', 'Story'];
+    const filtered = rawStyles
+      .filter(s => typeof s === 'string' && validStyles.includes(s))
+      .slice(0, MAX_STYLES);
+    if (filtered.length > 0) {
+      styles = filtered;
+    }
   }
 
   const prompt = `Generate 5 viral YouTube hooks for a faceless YouTube video.
 
 Topic: ${topic}
 
-Style: ${styles ? styles.join(', ') : 'Curiosity'}
+Style: ${styles.join(', ')}
 
 Rules:
 * Max 12 words per hook
@@ -54,23 +127,36 @@ Return as a numbered list.`;
 
     if (!response.ok) {
       const errText = await response.text();
-      return new Response(JSON.stringify({ error: 'AI service error. Please try again.' }), {
-        status: 502,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      console.error('OpenRouter error:', errText);
+      return jsonError(502, 'AI service error. Please try again.');
     }
 
     const data = await response.json();
     const generatedText = data.choices?.[0]?.message?.content || '';
 
-    return new Response(JSON.stringify({ text: generatedText }), {
+    if (!generatedText) {
+      return jsonError(502, 'AI returned empty response. Try a different topic.');
+    }
+
+    const result = { text: generatedText };
+    let responseBody;
+
+    if (isEncryptionConfigured()) {
+      const encrypted = await encrypt(result);
+      responseBody = JSON.stringify(encrypted);
+    } else {
+      responseBody = JSON.stringify(result);
+    }
+
+    return new Response(responseBody, {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'X-RateLimit-Remaining': String(remaining)
+      }
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    console.error('Generation error:', err);
+    return jsonError(500, 'Internal server error');
   }
 }

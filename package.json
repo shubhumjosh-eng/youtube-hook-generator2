@@ -2,9 +2,10 @@
   "name": "youtube-hook-generator",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "YouTube Hook Generator for Faceless Channels",
   "scripts": {
-    "dev": "npx serve .",
-    "start": "npx serve ."
+    "dev": "node server.mjs",
+    "start": "node server.mjs"
   }
 }

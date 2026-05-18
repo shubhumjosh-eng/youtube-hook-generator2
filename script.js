@@ -1,3 +1,83 @@
+const CLIENT_ID_KEY = 'hookforge_client_id';
+function getClientId() {
+  let id = localStorage.getItem(CLIENT_ID_KEY);
+  if (!id) {
+    id = crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    localStorage.setItem(CLIENT_ID_KEY, id);
+  }
+  return id;
+}
+
+function getUnlockToken() { return localStorage.getItem('hookforge_token'); }
+function setUnlockToken(t) { localStorage.setItem('hookforge_token', t); }
+function getAuthToken() { return localStorage.getItem('hookforge_auth_token'); }
+function setAuthToken(t) { localStorage.setItem('hookforge_auth_token', t); }
+function clearAuthToken() { localStorage.removeItem('hookforge_auth_token'); }
+function getBestToken() { return getAuthToken() || getUnlockToken(); }
+function isPaid() { return !!getAuthToken() || !!getUnlockToken(); }
+
+/* ── Request encryption ── */
+let _encryptionKey = null;
+
+async function _getEncryptionKey() {
+  if (_encryptionKey) return _encryptionKey;
+  try {
+    const res = await fetch('/api/key');
+    if (!res.ok) return null;
+    const data = await res.json();
+    _encryptionKey = data.key || null;
+    return _encryptionKey;
+  } catch {
+    return null;
+  }
+}
+
+function _hexToBytes(hex) {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+  return bytes;
+}
+
+function _bytesToHex(bytes) {
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function _encryptData(data, keyHex) {
+  const rawKey = _hexToBytes(keyHex);
+  const key = await crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['encrypt']);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encoded = new TextEncoder().encode(JSON.stringify(data));
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+  return { iv: _bytesToHex(iv), data: _bytesToHex(new Uint8Array(ciphertext)) };
+}
+
+async function _decryptData(encrypted, keyHex) {
+  const rawKey = _hexToBytes(keyHex);
+  const key = await crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['decrypt']);
+  const iv = _hexToBytes(encrypted.iv);
+  const ciphertext = _hexToBytes(encrypted.data);
+  const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+  return JSON.parse(new TextDecoder().decode(decrypted));
+}
+
+async function apiPost(url, data, extraHeaders) {
+  const keyHex = await _getEncryptionKey();
+  const body = keyHex ? JSON.stringify(await _encryptData(data, keyHex)) : JSON.stringify(data);
+  const headers = { 'Content-Type': 'application/json', ...extraHeaders };
+  const res = await fetch(url, { method: 'POST', headers, body });
+  const raw = await res.json();
+  if (keyHex && raw && raw.iv && raw.data) {
+    try { return { ok: res.ok, status: res.status, data: await _decryptData(raw, keyHex) }; }
+    catch { return { ok: false, status: 400, data: { error: 'Decryption failed' } }; }
+  }
+  return { ok: res.ok, status: res.status, data: raw };
+}
+
+_getEncryptionKey();
+
 const topicInput = document.getElementById('topic');
 const styleButtons = document.getElementById('styleButtons');
 const generateBtn = document.getElementById('generateBtn');
@@ -9,7 +89,6 @@ const scriptContent = document.getElementById('scriptContent');
 const closeScriptBtn = document.getElementById('closeScriptBtn');
 const copyScriptBtn = document.getElementById('copyScriptBtn');
 const paywallModal = document.getElementById('paywallModal');
-const paidBtn = document.getElementById('paidBtn');
 
 const FREE_LIMIT = 3;
 
@@ -23,14 +102,6 @@ function getUsageCount() {
 function incrementUsage() {
   const current = getUsageCount();
   localStorage.setItem('usageCount', String(current + 1));
-}
-
-function isPaid() {
-  return localStorage.getItem('paid') === 'true';
-}
-
-function markAsPaid() {
-  localStorage.setItem('paid', 'true');
 }
 
 function showPaywall() {
@@ -121,24 +192,6 @@ function escapeAttr(str) {
   return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-function buildPrompt(topic, styles) {
-  return `Generate 5 viral YouTube hooks for a faceless YouTube video.
-
-Topic: ${topic}
-
-Style: ${styles.join(', ')}
-
-Rules:
-* Max 12 words per hook
-* Extremely high curiosity
-* Designed for first 5 seconds retention
-* No fluff
-* No generic phrases
-* Make each hook irresistible
-
-Return as a numbered list.`;
-}
-
 async function generateHooks() {
   const topic = topicInput.value.trim();
   if (!topic) {
@@ -161,21 +214,8 @@ async function generateHooks() {
   setLoading(true);
 
   try {
-    const response = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        topic,
-        styles: selectedStyles
-      })
-    });
-
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error || 'Failed to generate hooks. Please try again.');
-    }
-
-    const data = await response.json();
+    const { ok, data } = await apiPost('/api/generate', { topic, styles: selectedStyles });
+    if (!ok) throw new Error(data.error || 'Failed to generate hooks. Please try again.');
     const hooks = parseHooks(data.text);
     renderHooks(hooks);
     resultsContainer.classList.remove('blurred');
@@ -204,12 +244,6 @@ styleButtons.addEventListener('click', (e) => {
 
 generateBtn.addEventListener('click', generateHooks);
 
-paidBtn.addEventListener('click', () => {
-  markAsPaid();
-  hidePaywall();
-  resultsContainer.classList.remove('blurred');
-});
-
 topicInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     generateHooks();
@@ -236,6 +270,7 @@ copyScriptBtn.addEventListener('click', () => {
 });
 
 async function generateScript(hook) {
+  if (!isPaid()) { showPaywall(); return; }
   scriptModal.style.display = 'flex';
   scriptContent.innerHTML = `
     <div class="script-loading">
@@ -249,18 +284,11 @@ async function generateScript(hook) {
   const style = selectedStyles.join(', ') || 'Curiosity';
 
   try {
-    const response = await fetch('/api/generate-script', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ hook, topic, style })
+    const { ok, data } = await apiPost('/api/generate-script', { hook, topic, style }, {
+      'Authorization': `Bearer ${getBestToken()}`,
+      'X-Client-Id': getClientId()
     });
-
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error || 'Failed to generate script.');
-    }
-
-    const data = await response.json();
+    if (!ok) throw new Error(data.error || 'Failed to generate script.');
     currentScriptText = data.script;
     const formattedScript = formatScript(data.script);
     scriptContent.innerHTML = `<div class="script-body">${formattedScript}</div>`;
@@ -288,4 +316,21 @@ function formatScript(text) {
     }
   }
   return html;
+}
+
+async function redeemCode() {
+  const input = document.getElementById('unlockCode').value.trim().toUpperCase();
+  const errEl = document.getElementById('codeError');
+  if (!input) { errEl.textContent = 'Please enter an unlock code.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  try {
+    const { ok, data } = await apiPost('/api/redeem', { code: input, clientId: getClientId() });
+    if (!ok) { errEl.textContent = data.error || 'Invalid code.'; errEl.style.display = 'block'; return; }
+    setUnlockToken(data.token);
+    hidePaywall();
+    if (resultsContainer) resultsContainer.classList.remove('blurred');
+  } catch {
+    errEl.textContent = 'Network error. Please check your connection.';
+    errEl.style.display = 'block';
+  }
 }

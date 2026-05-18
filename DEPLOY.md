@@ -27,9 +27,13 @@ git push -u origin main
 In the Vercel project settings:
 
 1. Go to **Settings** > **Environment Variables**
-2. Add the following variable:
-   - `OPENROUTER_API_KEY` = Your OpenRouter API key
-3. Get your API key at [openrouter.ai/keys](https://openrouter.ai/keys)
+2. Add the following variables:
+
+| Variable | Description |
+|----------|-------------|
+| `OPENROUTER_API_KEY` | Your OpenRouter API key (get at [openrouter.ai/keys](https://openrouter.ai/keys)) |
+| `UNLOCK_CODES` | JSON array of valid unlock codes, e.g. `["HOOK-A1B2-C3D4","HOOK-E5F6-G7H8"]` |
+| `UNLOCK_SECRET` | Random secret for signing auth tokens (generate with `openssl rand -hex 32`) |
 
 ### Step 4: Deploy
 
@@ -54,16 +58,13 @@ In the Vercel project settings:
 
 ## Environment Variables Summary
 
-| Variable | Description |
-|----------|-------------|
-| `OPENROUTER_API_KEY` | Your OpenRouter API key (required) |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENROUTER_API_KEY` | Yes | OpenRouter API key for AI generation |
+| `UNLOCK_CODES` | Yes* | JSON array of valid premium unlock codes |
+| `UNLOCK_SECRET` | Yes* | Secret key for HMAC token signing |
 
----
-
-## Usage Limits
-
-- Free tier: 3 generations (stored in `localStorage`)
-- Paid tier: Unlimited (after Gumroad purchase)
+*Required for premium features (script & video plan generation)
 
 ---
 
@@ -76,8 +77,21 @@ npm run dev
 
 Server runs at `http://localhost:3000`
 
-Note: The API endpoint requires the `OPENROUTER_API_KEY` env var to work locally. Create a `.env` file:
-
+Create a `.env` file in the project root:
 ```
 OPENROUTER_API_KEY=your_key_here
+UNLOCK_CODES=["HOOK-TEST-ABCD"]
+UNLOCK_SECRET=your_random_secret_key_at_least_32_chars
 ```
+
+---
+
+## Security Features
+
+- **Server-side paywall enforcement**: Unlock codes validated server-side; HMAC-signed tokens issued to authenticated clients
+- **Client-bound tokens**: Tokens cryptographically bound to a unique client ID
+- **Rate limiting**: Per-IP rate limiting on all API endpoints
+- **Input validation**: All user inputs sanitized, typed, and length-checked on the server
+- **Request size limits**: Maximum payload sizes enforced on all endpoints
+- **Security headers**: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Permissions-Policy, Referrer-Policy
+- **No secrets in client code**: API keys and unlock codes never exposed to the browser

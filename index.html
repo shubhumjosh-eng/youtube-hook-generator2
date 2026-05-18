@@ -781,6 +781,217 @@
 
     .faq-item.open .faq-answer { max-height: 300px; }
 
+    /* ── Auth Modal ── */
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 1.5rem;
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      padding: 3px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 0.6rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all var(--transition);
+    }
+
+    .auth-tab.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .auth-form {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .auth-form.active {
+      display: flex;
+    }
+
+    .auth-form label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .auth-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .auth-error {
+      font-size: 0.8rem;
+      color: var(--danger);
+      text-align: center;
+      display: none;
+    }
+
+    .auth-success {
+      font-size: 0.85rem;
+      color: var(--success);
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin: 0.5rem 0;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .user-menu {
+      position: relative;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .user-menu.visible {
+      display: flex;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .user-email-label {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .user-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.5rem;
+      min-width: 180px;
+      display: none;
+      z-index: 50;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .user-dropdown.open {
+      display: block;
+    }
+
+    .user-dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: none;
+      background: none;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 6px;
+      text-align: left;
+      transition: all var(--transition);
+    }
+
+    .user-dropdown-item:hover {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    .user-dropdown-item.danger:hover {
+      color: var(--danger);
+    }
+
+    .auth-buttons {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .auth-buttons.visible {
+      display: flex;
+    }
+
+    .auth-btn {
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .auth-btn-signin {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .auth-btn-signin:hover {
+      border-color: var(--accent-light);
+      color: var(--text);
+    }
+
+    .auth-btn-signup {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+    }
+
+    .auth-btn-signup:hover {
+      background: var(--accent-dark);
+      transform: translateY(-1px);
+    }
+
     /* ── Footer ── */
     .footer {
       border-top: 1px solid var(--border);
@@ -1197,6 +1408,18 @@
         <a href="#testimonials">Testimonials</a>
         <a href="#faq">FAQ</a>
       </div>
+      <div class="auth-buttons" id="authButtons">
+        <button type="button" class="auth-btn auth-btn-signin" onclick="openAuthModal('signin')">Sign In</button>
+        <button type="button" class="auth-btn auth-btn-signup" onclick="openAuthModal('signup')">Sign Up</button>
+      </div>
+      <div class="user-menu" id="userMenu">
+        <span class="user-email-label" id="userEmailLabel" onclick="toggleDropdown()"></span>
+        <div class="user-avatar" id="userAvatar"></div>
+        <div class="user-dropdown" id="userDropdown">
+          <button type="button" class="user-dropdown-item" onclick="document.getElementById('userDropdown').classList.remove('open')">Account</button>
+          <button type="button" class="user-dropdown-item danger" onclick="logout()">Sign Out</button>
+        </div>
+      </div>
       <a href="#generator" class="navbar-cta">Get Free Hooks</a>
       <button class="mobile-toggle" onclick="document.getElementById('mobileNav').classList.toggle('open')" aria-label="Menu">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -1210,6 +1433,7 @@
     <a href="#testimonials" onclick="this.parentElement.classList.remove('open')">Testimonials</a>
     <a href="#faq" onclick="this.parentElement.classList.remove('open')">FAQ</a>
     <a href="#generator" onclick="this.parentElement.classList.remove('open')">Get Free Hooks</a>
+    <a href="#" id="mobileAuthLink" onclick="this.parentElement.classList.remove('open'); openAuthModal('signin')">Sign In</a>
   </div>
 
   <!-- Hero -->
@@ -1482,6 +1706,39 @@
     </div>
   </div>
 
+  <!-- Auth Modal -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:0.5rem;">
+        <button type="button" class="modal-close" onclick="closeAuthModal()">&times;</button>
+      </div>
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="signinTab" onclick="switchAuthTab('signin')">Sign In</button>
+        <button type="button" class="auth-tab" id="signupTab" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+
+      <div class="auth-form active" id="signinForm">
+        <label for="signinEmail">Email</label>
+        <input type="email" class="auth-input" id="signinEmail" placeholder="you@example.com" autocomplete="email" />
+        <label for="signinPassword">Password</label>
+        <input type="password" class="auth-input" id="signinPassword" placeholder="At least 8 characters" autocomplete="current-password" />
+        <div class="auth-error" id="signinError"></div>
+        <button type="button" class="modal-btn-primary" id="signinBtn" onclick="signIn()">Sign In</button>
+      </div>
+
+      <div class="auth-form" id="signupForm">
+        <label for="signupEmail">Email</label>
+        <input type="email" class="auth-input" id="signupEmail" placeholder="you@example.com" autocomplete="email" />
+        <label for="signupPassword">Password</label>
+        <input type="password" class="auth-input" id="signupPassword" placeholder="At least 8 characters" autocomplete="new-password" />
+        <div class="auth-error" id="signupError"></div>
+        <button type="button" class="modal-btn-primary" id="signupBtn" onclick="signUp()">Create Account</button>
+        <div class="auth-divider">or</div>
+        <p style="font-size:0.8rem;color:var(--text-muted);text-align:center;">Already have an unlock code? <a href="#" style="color:var(--accent-light);text-decoration:none;" onclick="closeAuthModal();showPaywall();">Enter it here</a></p>
+      </div>
+    </div>
+  </div>
+
   <!-- Script Modal -->
   <div class="modal-overlay" id="scriptModal">
     <div class="modal-box modal-box-wide">
@@ -1533,8 +1790,98 @@
     }, { threshold: 0.1 });
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
+    /* ── Client ID for token binding ── */
+    const CLIENT_ID_KEY = 'hookforge_client_id';
+    function getClientId() {
+      let id = localStorage.getItem(CLIENT_ID_KEY);
+      if (!id) {
+        id = crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = Math.random() * 16 | 0;
+          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+        localStorage.setItem(CLIENT_ID_KEY, id);
+      }
+      return id;
+    }
+
     /* ── Storage helpers ── */
-    function isPaid() { return localStorage.getItem('paid') === 'true'; }
+    function getUnlockToken() { return localStorage.getItem('hookforge_token'); }
+    function setUnlockToken(t) { localStorage.setItem('hookforge_token', t); }
+    function getAuthToken() { return localStorage.getItem('hookforge_auth_token'); }
+    function setAuthToken(t) { localStorage.setItem('hookforge_auth_token', t); }
+    function clearAuthToken() { localStorage.removeItem('hookforge_auth_token'); }
+    function getBestToken() { return getAuthToken() || getUnlockToken(); }
+    function isPaid() { return !!getAuthToken() || !!getUnlockToken(); }
+
+    /* ── Request encryption ── */
+    let _encryptionKey = null;
+
+    async function _getEncryptionKey() {
+      if (_encryptionKey) return _encryptionKey;
+      try {
+        const res = await fetch('/api/key');
+        if (!res.ok) return null;
+        const data = await res.json();
+        _encryptionKey = data.key || null;
+        return _encryptionKey;
+      } catch {
+        return null;
+      }
+    }
+
+    function _hexToBytes(hex) {
+      const bytes = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+      }
+      return bytes;
+    }
+
+    function _bytesToHex(bytes) {
+      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function _encryptData(data, keyHex) {
+      const rawKey = _hexToBytes(keyHex);
+      const key = await crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['encrypt']);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const encoded = new TextEncoder().encode(JSON.stringify(data));
+      const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+      return { iv: _bytesToHex(iv), data: _bytesToHex(new Uint8Array(ciphertext)) };
+    }
+
+    async function _decryptData(encrypted, keyHex) {
+      const rawKey = _hexToBytes(keyHex);
+      const key = await crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['decrypt']);
+      const iv = _hexToBytes(encrypted.iv);
+      const ciphertext = _hexToBytes(encrypted.data);
+      const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+      return JSON.parse(new TextDecoder().decode(decrypted));
+    }
+
+    async function apiPost(url, data, extraHeaders) {
+      const keyHex = await _getEncryptionKey();
+      let body;
+      if (keyHex) {
+        body = JSON.stringify(await _encryptData(data, keyHex));
+      } else {
+        body = JSON.stringify(data);
+      }
+      const headers = { 'Content-Type': 'application/json', ...extraHeaders };
+      const res = await fetch(url, { method: 'POST', headers, body });
+      const raw = await res.json();
+      if (keyHex && raw && raw.iv && raw.data) {
+        try {
+          return { ok: res.ok, status: res.status, data: await _decryptData(raw, keyHex) };
+        } catch {
+          return { ok: false, status: 400, data: { error: 'Decryption failed' } };
+        }
+      }
+      return { ok: res.ok, status: res.status, data: raw };
+    }
+
+    /* ── Fetch encryption key on load ── */
+    _getEncryptionKey();
 
     function updateUsageDisplay() {
       usageInfo.textContent = isPaid() ? 'Scripts & video plans unlocked' : 'Free — generate unlimited hooks';
@@ -1558,37 +1905,161 @@
     function hidePaywall() { paywallModal.classList.remove('active'); }
     paywallModal.addEventListener('click', (e) => { if (e.target === paywallModal) hidePaywall(); });
 
-    const UNLOCK_CODES = {
-      'HOOK-A1B2-C3D4': true,
-      'HOOK-E5F6-G7H8': true,
-      'HOOK-I9J0-K1L2': true,
-      'HOOK-M3N4-O5P6': true,
-      'HOOK-Q7R8-S9T0': true,
-      'HOOK-U1V2-W3X4': true,
-      'HOOK-Y5Z6-A7B8': true,
-      'HOOK-C9D0-E1F2': true,
-      'HOOK-G3H4-I5J6': true,
-      'HOOK-K7L8-M9N0': true,
-    };
-    const USED_CODES_KEY = 'usedUnlockCodes';
-
-    function getUsedCodes() {
-      try { return JSON.parse(localStorage.getItem(USED_CODES_KEY) || '[]'); } catch { return []; }
-    }
-
-    function redeemCode() {
+    async function redeemCode() {
       const input = document.getElementById('unlockCode').value.trim().toUpperCase();
       const errEl = document.getElementById('codeError');
+      const btn = errEl.nextElementSibling;
       if (!input) { errEl.textContent = 'Please enter an unlock code.'; errEl.style.display = 'block'; return; }
-      if (!UNLOCK_CODES[input]) { errEl.textContent = 'Invalid code.'; errEl.style.display = 'block'; return; }
-      if (getUsedCodes().includes(input)) { errEl.textContent = 'Code already used.'; errEl.style.display = 'block'; return; }
-      const used = getUsedCodes();
-      used.push(input);
-      localStorage.setItem(USED_CODES_KEY, JSON.stringify(used));
-      localStorage.setItem('paid', 'true');
-      updateUsageDisplay();
-      hidePaywall();
+      errEl.style.display = 'none';
+      if (btn) btn.disabled = true;
+      try {
+        const { ok, data } = await apiPost('/api/redeem', { code: input, clientId: getClientId() });
+        if (!ok) { errEl.textContent = data.error || 'Invalid code.'; errEl.style.display = 'block'; return; }
+        setUnlockToken(data.token);
+        updateUsageDisplay();
+        hidePaywall();
+      } catch {
+        errEl.textContent = 'Network error. Please check your connection.';
+        errEl.style.display = 'block';
+      } finally {
+        if (btn) btn.disabled = false;
+      }
     }
+
+    /* ── Auth ── */
+    function openAuthModal(tab) {
+      document.getElementById('authModal').classList.add('active');
+      switchAuthTab(tab || 'signin');
+      document.getElementById('signinError').style.display = 'none';
+      document.getElementById('signupError').style.display = 'none';
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.remove('active');
+    }
+    document.getElementById('authModal')?.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('authModal')) closeAuthModal();
+    });
+
+    function switchAuthTab(tab) {
+      document.getElementById('signinTab').classList.toggle('active', tab === 'signin');
+      document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
+      document.getElementById('signinForm').classList.toggle('active', tab === 'signin');
+      document.getElementById('signupForm').classList.toggle('active', tab === 'signup');
+    }
+
+    function getInitials(email) {
+      return email.charAt(0).toUpperCase();
+    }
+
+    function toggleDropdown() {
+      document.getElementById('userDropdown').classList.toggle('open');
+    }
+
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('userMenu');
+      const dd = document.getElementById('userDropdown');
+      if (menu && dd && !menu.contains(e.target)) {
+        dd.classList.remove('open');
+      }
+    });
+
+    async function checkAuth() {
+      const token = getAuthToken();
+      const authBtns = document.getElementById('authButtons');
+      const userMenu = document.getElementById('userMenu');
+      if (!token) {
+        authBtns?.classList.add('visible');
+        userMenu?.classList.remove('visible');
+        const mobileLink = document.getElementById('mobileAuthLink');
+        if (mobileLink) mobileLink.textContent = 'Sign In';
+        return false;
+      }
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) {
+          clearAuthToken();
+          authBtns?.classList.add('visible');
+          userMenu?.classList.remove('visible');
+          const mobileLink = document.getElementById('mobileAuthLink');
+          if (mobileLink) mobileLink.textContent = 'Sign In';
+          return false;
+        }
+        const data = await res.json();
+        const email = data.user.email;
+        document.getElementById('userEmailLabel').textContent = email;
+        document.getElementById('userAvatar').textContent = getInitials(email);
+        authBtns?.classList.remove('visible');
+        userMenu?.classList.add('visible');
+        const mobileLink = document.getElementById('mobileAuthLink');
+        if (mobileLink) mobileLink.textContent = `Signed in as ${email}`;
+        return true;
+      } catch {
+        return !!token;
+      }
+    }
+
+    async function signIn() {
+      const email = document.getElementById('signinEmail').value.trim();
+      const password = document.getElementById('signinPassword').value;
+      const errEl = document.getElementById('signinError');
+      const btn = document.getElementById('signinBtn');
+      errEl.style.display = 'none';
+      if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+      try {
+        const { ok, data } = await apiPost('/api/auth/login', { email, password });
+        if (!ok) { errEl.textContent = data.error || 'Login failed.'; errEl.style.display = 'block'; return; }
+        setAuthToken(data.token);
+        closeAuthModal();
+        await checkAuth();
+      } catch {
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    }
+
+    async function signUp() {
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const errEl = document.getElementById('signupError');
+      const btn = document.getElementById('signupBtn');
+      errEl.style.display = 'none';
+      if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
+      if (password.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+      try {
+        const { ok, data } = await apiPost('/api/auth/register', { email, password });
+        if (!ok) { errEl.textContent = data.error || 'Registration failed.'; errEl.style.display = 'block'; return; }
+        setAuthToken(data.token);
+        closeAuthModal();
+        await checkAuth();
+      } catch {
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    }
+
+    function logout() {
+      clearAuthToken();
+      document.getElementById('userDropdown').classList.remove('open');
+      checkAuth();
+    }
+
+    signinEmail?.addEventListener('keydown', (e) => { if (e.key === 'Enter') signIn(); });
+    signinPassword?.addEventListener('keydown', (e) => { if (e.key === 'Enter') signIn(); });
+    signupEmail?.addEventListener('keydown', (e) => { if (e.key === 'Enter') signUp(); });
+    signupPassword?.addEventListener('keydown', (e) => { if (e.key === 'Enter') signUp(); });
 
     /* ── Parse hooks ── */
     function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
@@ -1656,14 +2127,8 @@
       generateBtn.disabled = true;
 
       try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ topic, styles: selectedStyles.length > 0 ? selectedStyles : ['Curiosity'] }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to generate hooks. Please try again.');
+        const { ok, data } = await apiPost('/api/generate', { topic, styles: selectedStyles.length > 0 ? selectedStyles : ['Curiosity'] });
+        if (!ok) throw new Error(data.error || 'Failed to generate hooks. Please try again.');
 
         const text = data.text;
         if (/I'm sorry|cannot help|can't help|not appropriate|inappropriate|against.*policy/i.test(text)) {
@@ -1708,13 +2173,11 @@
       const topic = topicInput.value.trim();
       const style = selectedStyles.length > 0 ? selectedStyles.join(', ') : 'Curiosity';
       try {
-        const res = await fetch('/api/generate-script', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ hook, topic, style }),
+        const { ok, data } = await apiPost('/api/generate-script', { hook, topic, style }, {
+          'Authorization': `Bearer ${getBestToken()}`,
+          'X-Client-Id': getClientId()
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to generate script.');
+        if (!ok) throw new Error(data.error || 'Failed to generate script.');
         if (/I'm sorry|cannot help|can't help|not appropriate|inappropriate|against.*policy/i.test(data.script)) {
           document.getElementById('scriptBody').innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:2rem;">This topic can\'t be processed. Try a different one.</p>';
           return;
@@ -1765,13 +2228,11 @@
       const topic = topicInput.value.trim();
       const style = selectedStyles.length > 0 ? selectedStyles.join(', ') : 'Curiosity';
       try {
-        const res = await fetch('/api/generate-video-plan', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ hook, topic, style }),
+        const { ok, data } = await apiPost('/api/generate-video-plan', { hook, topic, style }, {
+          'Authorization': `Bearer ${getBestToken()}`,
+          'X-Client-Id': getClientId()
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to generate video plan.');
+        if (!ok) throw new Error(data.error || 'Failed to generate video plan.');
         if (/I'm sorry|cannot help|can't help|not appropriate|inappropriate|against.*policy/i.test(data.videoPlan)) {
           document.getElementById('videoPlanBody').innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:2rem;">This topic can\'t be processed. Try a different one.</p>';
           return;
@@ -1817,6 +2278,7 @@
     });
 
     updateUsageDisplay();
+    checkAuth();
 
     function closeModal(id) {
       document.getElementById(id).classList.remove('active');
