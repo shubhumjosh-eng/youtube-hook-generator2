@@ -1,4 +1,5 @@
 import { applyRateLimit, sanitize, jsonError, checkOrigin } from '../lib/_security.js';
+import { cacheKey, get, set } from '../lib/_cache.js';
 
 const ALLOWED_ORIGINS = [
   'https://youtube-hook-generator2.vercel.app',
@@ -6,6 +7,8 @@ const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   'http://localhost:5000'
 ];
+
+const AI_TIMEOUT = 25_000;
 
 export const config = { runtime: 'edge' };
 
@@ -51,7 +54,20 @@ Rules:
 * Make each hook irresistible
 Return as a numbered list.`;
 
+  const bodyForCache = { topic, styles };
+  const cKey = cacheKey('/api/generate', bodyForCache);
+  const cached = get(cKey);
+  if (cached) {
+    return new Response(JSON.stringify({ text: cached, cached: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), AI_TIMEOUT);
+
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -63,8 +79,10 @@ Return as a numbered list.`;
       body: JSON.stringify({
         model: 'nvidia/nemotron-3-nano-30b-a3b:free',
         messages: [{ role: 'user', content: prompt }]
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
 
     if (!response.ok) {
       await response.text();
@@ -75,11 +93,16 @@ Return as a numbered list.`;
     const text = data.choices?.[0]?.message?.content || '';
     if (!text) return jsonError(502, 'Empty response. Try a different topic.');
 
+    set(cKey, text);
+
     return new Response(JSON.stringify({ text }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (err) {
+    if (err.name === 'AbortError') {
+      return jsonError(504, 'AI service timed out. Try again.');
+    }
     console.error('Generate error:', err);
     return jsonError(500, 'Internal server error');
   }

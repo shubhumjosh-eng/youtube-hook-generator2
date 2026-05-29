@@ -1,4 +1,5 @@
 import { applyRateLimit, sanitize, checkOrigin, verifyToken } from '../lib/_security.js';
+import { cacheKey, get, set } from '../lib/_cache.js';
 
 const ALLOWED_ORIGINS = [
   'https://youtube-hook-generator2.vercel.app',
@@ -6,6 +7,8 @@ const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   'http://localhost:5000'
 ];
+
+const AI_TIMEOUT = 30_000;
 
 export const config = { runtime: 'edge' };
 
@@ -72,7 +75,17 @@ Format:
 
 Make every second count.`;
 
+  const bodyForCache = { hook: safeHook, topic: safeTopic, style: safeStyle };
+  const cKey = cacheKey('/api/generate-script', bodyForCache);
+  const cached = get(cKey);
+  if (cached) {
+    return new Response(JSON.stringify({ script: cached, cached: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  }
+
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), AI_TIMEOUT);
+
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -84,8 +97,10 @@ Make every second count.`;
       body: JSON.stringify({
         model: 'nvidia/nemotron-3-nano-30b-a3b:free',
         messages: [{ role: 'user', content: prompt }]
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
 
     if (!response.ok) { await response.text(); return new Response(JSON.stringify({ error: 'AI service error.' }), { status: 502, headers: { 'Content-Type': 'application/json' } }); }
 
@@ -93,8 +108,13 @@ Make every second count.`;
     const text = data.choices?.[0]?.message?.content || '';
     if (!text) return new Response(JSON.stringify({ error: 'Empty response. Try a different hook.' }), { status: 502, headers: { 'Content-Type': 'application/json' } });
 
+    set(cKey, text);
+
     return new Response(JSON.stringify({ script: text }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
+    if (err.name === 'AbortError') {
+      return new Response(JSON.stringify({ error: 'AI service timed out. Try again.' }), { status: 504, headers: { 'Content-Type': 'application/json' } });
+    }
     console.error('Script error:', err);
     return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }

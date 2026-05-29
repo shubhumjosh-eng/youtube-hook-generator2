@@ -1,5 +1,6 @@
 import http from 'http';
-import fs from 'fs';
+import fs from 'fs/promises';
+import fsSync from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import crypto from 'crypto';
@@ -24,11 +25,11 @@ const MIME = {
   '.ico': 'image/x-icon',
 };
 
-/* ── Read .env ── */
+/* ── Read .env (sync once at startup, acceptable) ── */
 function loadEnv() {
   const envPath = path.join(__dirname, '.env');
-  if (fs.existsSync(envPath)) {
-    for (const line of fs.readFileSync(envPath, 'utf-8').split('\n')) {
+  if (fsSync.existsSync(envPath)) {
+    for (const line of fsSync.readFileSync(envPath, 'utf-8').split('\n')) {
       const trimmed = line.trim();
       if (!trimmed || trimmed.startsWith('#')) continue;
       const eq = trimmed.indexOf('=');
@@ -44,14 +45,20 @@ loadEnv();
 /* ── Serve static files ── */
 async function serveStatic(reqUrl, res) {
   let filePath = path.join(__dirname, reqUrl === '/' ? 'index.html' : reqUrl);
-  if (!fs.existsSync(filePath)) {
+  try {
+    await fs.access(filePath);
+  } catch {
     const alt = path.join(__dirname, reqUrl + '.html');
-    if (fs.existsSync(alt)) filePath = alt;
-    else { res.writeHead(404); res.end('Not found'); return; }
+    try {
+      await fs.access(alt);
+      filePath = alt;
+    } catch {
+      res.writeHead(404); res.end('Not found'); return;
+    }
   }
   const ext = path.extname(filePath);
   const mime = MIME[ext] || 'application/octet-stream';
-  const content = fs.readFileSync(filePath);
+  const content = await fs.readFile(filePath);
   res.writeHead(200, { 'Content-Type': mime });
   res.end(content);
 }
@@ -59,7 +66,9 @@ async function serveStatic(reqUrl, res) {
 /* ── Dynamic API handler ── */
 async function callApi(modulePath, req, res) {
   const fullPath = path.join(__dirname, 'api', modulePath);
-  if (!fs.existsSync(fullPath)) {
+  try {
+    await fs.access(fullPath);
+  } catch {
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Not found' }));
     return;
