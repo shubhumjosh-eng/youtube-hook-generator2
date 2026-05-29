@@ -53,7 +53,9 @@ async function serveStatic(reqUrl, res) {
       await fs.access(alt);
       filePath = alt;
     } catch {
-      res.writeHead(404); res.end('Not found'); return;
+      res.writeHead(404, { 'Content-Type': 'text/html' });
+      res.end(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>404 — HookForge</title><style>body{background:#0a0a0a;color:#a1a1aa;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:2rem}h1{color:#fff;font-size:4rem;font-weight:800;margin-bottom:0.5rem;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}p{margin-bottom:2rem}a{color:#a78bfa;text-decoration:underline}</style></head><body><div><h1>404</h1><p>This page doesn't exist.</p><a href="/">Back to HookForge</a></div></body></html>`);
+      return;
     }
   }
   const ext = path.extname(filePath);

@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>YouTube Hook Generator — Get Viral Hooks in 5 Seconds</title>
+  <meta name="description" content="Generate 5 scroll-stopping YouTube hooks in 5 seconds. Free, no signup. Built for faceless creators." />
+  <meta property="og:title" content="HookForge — Viral YouTube Hook Generator" />
+  <meta property="og:description" content="Generate 5 scroll-stopping YouTube hooks in 5 seconds. Free, no signup." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://youtube-hook-generator2.vercel.app" />
+  <meta property="og:image" content="https://youtube-hook-generator2.vercel.app/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="HookForge — Viral YouTube Hook Generator" />
+  <meta name="twitter:description" content="Generate 5 scroll-stopping YouTube hooks in 5 seconds. Free, no signup." />
+  <link rel="canonical" href="https://youtube-hook-generator2.vercel.app" />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-8VBJNHSME2"></script>
   <script>
@@ -1445,6 +1455,7 @@
   </div>
 
   <!-- Hero -->
+  <main>
   <section class="hero" id="generator">
     <div class="hero-glow"></div>
 
@@ -1478,7 +1489,7 @@
     <div class="generator-card">
       <div class="gen-input-wrap">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" class="gen-input" id="topic" placeholder="e.g. How to make money with AI in 2026" autocomplete="off" />
+        <input type="text" class="gen-input" id="topic" placeholder="e.g. How to make money with AI in 2026" autocomplete="off" aria-label="Video topic" />
       </div>
 
       <div class="style-pills" id="stylePills">
@@ -1642,28 +1653,28 @@
   <section class="faq-section reveal" id="faq">
     <h2>Got questions?</h2>
     <div class="faq-item">
-      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+      <button class="faq-question">
         Is HookForge really free?
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
       <div class="faq-answer">        <p>Yes! Generating hooks is completely free and unlimited. You only pay if you want full YouTube scripts and video production plans — a one-time $9 payment, no subscriptions.</p></div>
     </div>
     <div class="faq-item">
-      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+      <button class="faq-question">
         What makes these hooks different?
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
       <div class="faq-answer"><p>Every hook is specifically engineered for faceless YouTube channels. They're capped at 12 words, designed for first-5-second retention, and avoid generic phrases that viewers scroll past.</p></div>
     </div>
     <div class="faq-item">
-      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+      <button class="faq-question">
         Do I need to create an account?
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
       <div class="faq-answer"><p>No account, no email, no login. Just type your topic, pick a style, and get hooks instantly. We respect your privacy.</p></div>
     </div>
     <div class="faq-item">
-      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+      <button class="faq-question">
         What styles should I choose?
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
@@ -1672,9 +1683,10 @@
   </section>
 
   <!-- Footer -->
+  </main>
   <footer class="footer">
     <div class="footer-inner">
-      <div class="footer-left">HookForge &copy; 2026. Built for faceless creators.</div>
+      <div class="footer-left">HookForge &copy; <span id="copyrightYear">2026</span>. Built for faceless creators.</div>
       <div class="footer-links">
         <a href="#features">Features</a>
         <a href="#faq">FAQ</a>
@@ -1698,7 +1710,7 @@
           <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:0.35rem;">Already paid? Enter your unlock code:</label>
           <div style="display:flex;gap:0.5rem;">
             <input type="text" id="unlockCode" placeholder="HOOK-XXXX-XXXX" style="flex:1;padding:0.75rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:inherit;font-size:0.9rem;" />
-            <button type="button" class="modal-btn-primary" style="padding:0.75rem 1rem;width:auto;" onclick="redeemCode()">Unlock</button>
+            <button type="button" class="modal-btn-primary" id="redeemBtn" style="padding:0.75rem 1rem;width:auto;" onclick="redeemCode()">Unlock</button>
           </div>
           <div id="codeError" style="font-size:0.8rem;color:var(--danger);margin-top:0.35rem;display:none;"></div>
         </div>
@@ -1848,7 +1860,7 @@
     async function redeemCode() {
       const input = document.getElementById('unlockCode').value.trim().toUpperCase();
       const errEl = document.getElementById('codeError');
-      const btn = errEl.nextElementSibling;
+      const btn = document.getElementById('redeemBtn');
       if (!input) { errEl.textContent = 'Please enter an unlock code.'; errEl.style.display = 'block'; return; }
       errEl.style.display = 'none';
       if (btn) btn.disabled = true;
@@ -1879,137 +1891,10 @@
       document.getElementById('signupError').style.display = 'none';
     }
 
-    function closeAuthModal() {
-      document.getElementById('authModal').classList.remove('active');
-    }
-    document.getElementById('authModal')?.addEventListener('click', (e) => {
-      if (e.target === document.getElementById('authModal')) closeAuthModal();
-    });
-
-    function switchAuthTab(tab) {
-      document.getElementById('signinTab').classList.toggle('active', tab === 'signin');
-      document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
-      document.getElementById('signinForm').classList.toggle('active', tab === 'signin');
-      document.getElementById('signupForm').classList.toggle('active', tab === 'signup');
-    }
-
-    function getInitials(email) {
-      return email.charAt(0).toUpperCase();
-    }
-
-    function toggleDropdown() {
-      document.getElementById('userDropdown').classList.toggle('open');
-    }
-
-    document.addEventListener('click', (e) => {
-      const menu = document.getElementById('userMenu');
-      const dd = document.getElementById('userDropdown');
-      if (menu && dd && !menu.contains(e.target)) {
-        dd.classList.remove('open');
-      }
-    });
-
-    async function checkAuth() {
-      const token = getAuthToken();
-      const authBtns = document.getElementById('authButtons');
-      const userMenu = document.getElementById('userMenu');
-      if (!token) {
-        authBtns?.classList.add('visible');
-        userMenu?.classList.remove('visible');
-        const mobileLink = document.getElementById('mobileAuthLink');
-        if (mobileLink) mobileLink.textContent = 'Sign In';
-        return false;
-      }
-      try {
-        const res = await fetch('/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!res.ok) {
-          clearAuthToken();
-          authBtns?.classList.add('visible');
-          userMenu?.classList.remove('visible');
-          const mobileLink = document.getElementById('mobileAuthLink');
-          if (mobileLink) mobileLink.textContent = 'Sign In';
-          return false;
-        }
-        const data = await res.json();
-        const email = data.user.email;
-        document.getElementById('userEmailLabel').textContent = email;
-        document.getElementById('userAvatar').textContent = getInitials(email);
-        authBtns?.classList.remove('visible');
-        userMenu?.classList.add('visible');
-        const mobileLink = document.getElementById('mobileAuthLink');
-        if (mobileLink) mobileLink.textContent = `Signed in as ${email}`;
-        return true;
-      } catch {
-        return !!token;
-      }
-    }
-
-    async function signIn() {
-      const email = document.getElementById('signinEmail').value.trim();
-      const password = document.getElementById('signinPassword').value;
-      const errEl = document.getElementById('signinError');
-      const btn = document.getElementById('signinBtn');
-      errEl.style.display = 'none';
-      if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
-      btn.disabled = true;
-      btn.textContent = 'Signing in...';
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        if (!res.ok) { errEl.textContent = data.error || 'Login failed.'; errEl.style.display = 'block'; return; }
-        setAuthToken(data.token);
-        closeAuthModal();
-        await checkAuth();
-      } catch {
-        errEl.textContent = 'Network error. Please try again.';
-        errEl.style.display = 'block';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Sign In';
-      }
-    }
-
-    async function signUp() {
-      const email = document.getElementById('signupEmail').value.trim();
-      const password = document.getElementById('signupPassword').value;
-      const errEl = document.getElementById('signupError');
-      const btn = document.getElementById('signupBtn');
-      errEl.style.display = 'none';
-      if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
-      if (password.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
-      btn.disabled = true;
-      btn.textContent = 'Creating account...';
-      try {
-        const res = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        if (!res.ok) { errEl.textContent = data.error || 'Registration failed.'; errEl.style.display = 'block'; return; }
-        setAuthToken(data.token);
-        closeAuthModal();
-        await checkAuth();
-      } catch {
-        errEl.textContent = 'Network error. Please try again.';
-        errEl.style.display = 'block';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Create Account';
-      }
-    }
-
-    function logout() {
-      clearAuthToken();
-      document.getElementById('userDropdown').classList.remove('open');
-      checkAuth();
-    }
+    const signinEmail = document.getElementById('signinEmail');
+    const signinPassword = document.getElementById('signinPassword');
+    const signupEmail = document.getElementById('signupEmail');
+    const signupPassword = document.getElementById('signupPassword');
 
     signinEmail?.addEventListener('keydown', (e) => { if (e.key === 'Enter') signIn(); });
     signinPassword?.addEventListener('keydown', (e) => { if (e.key === 'Enter') signIn(); });
@@ -2162,7 +2047,7 @@
         const t = line.trim();
         if (!t) return '';
         if (/^\[.*\]/.test(t)) return `<span class="scene-label">${escHtml(t)}</span>`;
-        if (/^\*{2}|^\#{1,3}/.test(t)) return `<div style="font-weight:700;color:var(--text);margin:0.75rem 0 0.35rem;">${escHtml(t.replace(/[\*\#]/g, ''))}</div>`;
+        if (/^\*{2}|^\#{1,3}/.test(t)) return `<div style="font-weight:700;color:var(--text);margin:0.75rem 0 0.35rem;">${escHtml(t.replace(/^[\*\#]+/, '').trim())}</div>`;
         return `<div class="script-line">${escHtml(t)}</div>`;
       }).filter(Boolean).join('');
     }
@@ -2171,7 +2056,8 @@
       navigator.clipboard.writeText(currentScriptText).then(() => {
         const btn = document.getElementById('copyScriptBtn');
         btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Copy Full Script'; }, 2000);
+        btn.style.background = 'var(--success)';
+        setTimeout(() => { btn.textContent = 'Copy Full Script'; btn.style.background = ''; }, 2000);
       });
     }
 
@@ -2232,7 +2118,7 @@
           if (match) return `<div class="detail-row"><span class="detail-label">${escHtml(match[1])}</span><span class="detail-value">${escHtml(match[2])}</span></div>`;
         }
         if (/^- /.test(t)) return `<div style="margin-left:1rem;margin:0.15rem 0;color:var(--text-muted);">• ${escHtml(t.slice(2))}</div>`;
-        if (/^\*{2}|^\#{1,3}/.test(t)) return `<div style="font-weight:700;color:var(--text);margin:1rem 0 0.5rem;">${escHtml(t.replace(/[\*\#]/g, ''))}</div>`;
+        if (/^\*{2}|^\#{1,3}/.test(t)) return `<div style="font-weight:700;color:var(--text);margin:1rem 0 0.5rem;">${escHtml(t.replace(/^[\*\#]+/, '').trim())}</div>`;
         return `<div class="plan-line">${escHtml(t)}</div>`;
       }).filter(Boolean).join('');
     }
@@ -2241,7 +2127,8 @@
       navigator.clipboard.writeText(currentVideoPlanText).then(() => {
         const btn = document.getElementById('copyVideoPlanBtn');
         btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Copy Full Plan'; }, 2000);
+        btn.style.background = 'var(--success)';
+        setTimeout(() => { btn.textContent = 'Copy Full Plan'; btn.style.background = ''; }, 2000);
       });
     }
 
@@ -2252,6 +2139,8 @@
 
     updateUsageDisplay();
     checkAuth();
+
+    document.getElementById('copyrightYear').textContent = new Date().getFullYear().toString();
 
     function closeModal(id) {
       document.getElementById(id).classList.remove('active');
